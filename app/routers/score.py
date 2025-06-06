@@ -10,4 +10,3 @@ router = APIRouter(prefix="/score")
 async def score_wallet(data: WalletData) -> dict:
     """Return a Bayesian risk score for the given wallet."""
     return await calculate_score(data)
-
