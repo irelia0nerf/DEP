@@ -40,6 +40,8 @@ def detect_patterns(data: dict) -> List[str]:
 
 
 async def analyze_wallet(wallet_address: str) -> List[str]:
+    """Analyze on-chain data and return reputation flags."""
+
     headers = {"X-API-KEY": BITQUERY_API_KEY} if BITQUERY_API_KEY else {}
     payload = {"query": build_graph_query(wallet_address)}
     async with httpx.AsyncClient() as client:
