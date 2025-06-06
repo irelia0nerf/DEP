@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.models.scorelab import AnalysisRequest, AnalysisResult
 from app.services import scorelab_service
 
-router = APIRouter()
+router = APIRouter(prefix="/internal/v1")
 
 
 @router.post("/scorelab/analyze", response_model=AnalysisResult)

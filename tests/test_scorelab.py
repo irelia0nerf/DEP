@@ -6,7 +6,7 @@ import httpx
 from httpx import AsyncClient
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from main import app
+from main import app  # noqa: E402
 
 
 @pytest.mark.asyncio
