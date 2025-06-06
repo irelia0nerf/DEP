@@ -7,5 +7,5 @@ app.include_router(score.router)
 
 
 @app.get("/")
-async def root():
+def root():
     return {"status": "FoundLab DEP API online"}

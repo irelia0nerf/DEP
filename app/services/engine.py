@@ -1,27 +1,43 @@
-from typing import Any, Dict
+from __future__ import annotations
+
+from typing import List
+
+from app.models.schemas import WalletData
 
 
-def calculate_px(
-    event_flags: Dict[str, Any],
-    weights: Dict[str, float],
-) -> float:
-    """Calculate dynamic probability Px based on event flags and weights.
-
-    Args:
-        event_flags: Mapping of flag names to values (bool or str).
-        weights: Mapping of flag names to weight adjustments.
-
-    Returns:
-        Probability value between 0 and 1.
-    """
-    px = 0.5  # Neutral starting probability
-    for flag, value in event_flags.items():
-        weight = weights.get(flag, 0.0)
-        if isinstance(value, bool):
-            px += weight if value else -weight
-        elif isinstance(value, str):
-            if value.lower() == "high":
-                px += weight
-            elif value.lower() == "low":
-                px -= weight
+def bayes_px(p_e_given_x: float, p_x: float, p_e: float) -> float:
+    """Return probability of event X given evidence E using Bayes' theorem."""
+    if p_e <= 0:
+        return 0.0
+    px = (p_e_given_x * p_x) / p_e
     return max(0.0, min(px, 1.0))
+
+
+async def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
+    """Derive probabilities from wallet data.
+
+    A simple heuristic is used purely for demonstration.
+    """
+    p_x = 0.4 if data.tx_volume > 1000 else 0.3
+    p_e_given_x = 0.8 if data.age_days > 180 else 0.5
+    p_e = 0.6 if data.tx_volume > 500 and data.age_days > 90 else 0.2
+    return p_e_given_x, p_x, p_e
+
+
+async def calculate_score(data: WalletData) -> dict:
+    """Calculate a score for the wallet based on Bayesian inference."""
+    p_e_given_x, p_x, p_e = await compute_probabilities(data)
+    probability = bayes_px(p_e_given_x, p_x, p_e)
+    score = int(probability * 1000)
+    if score >= 800:
+        tier = "AAA"
+    elif score >= 500:
+        tier = "BB"
+    else:
+        tier = "RISK"
+    flags: List[str] = []
+    if probability < 0.5:
+        flags.append("low_probability")
+    if data.tx_volume < 100:
+        flags.append("low_activity")
+    return {"score": score, "tier": tier, "probability": probability, "flags": flags}
