@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from app.routers import scorelab
+from app.routers import score
 
-app = FastAPI(title="FoundLab DEP API")
-app.include_router(scorelab.router, prefix="/internal/v1")
+app = FastAPI()
+
+app.include_router(score.router)
 
 
-@app.get("/health")
-async def healthcheck():
-    return {"status": "ok"}
+@app.get("/")
+async def root():
+    return {"status": "FoundLab DEP API online"}
