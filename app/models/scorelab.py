@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 
@@ -12,3 +13,4 @@ class AnalysisResult(BaseModel):
     score: int
     tier: str
     confidence: float
+    timestamp: datetime

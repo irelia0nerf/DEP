@@ -22,7 +22,7 @@ async def analyze(wallet_address: str) -> dict:
     Parameters
     ----------
     wallet_address:
-        Address of the wallet being analysed.
+        Address of the wallet being analyzed.
 
     Returns
     -------

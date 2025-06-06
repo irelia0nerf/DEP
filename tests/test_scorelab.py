@@ -18,6 +18,7 @@ async def test_scorelab_analyze(monkeypatch):
             "score": 90,
             "tier": "AAA",
             "confidence": 0.99,
+            "timestamp": "2025-01-01T00:00:00Z",
         }
 
     monkeypatch.setattr("app.services.scorelab_service.analyze", mock_analyze)
@@ -31,3 +32,4 @@ async def test_scorelab_analyze(monkeypatch):
     data = response.json()
     assert data["wallet"] == "0x123"
     assert data["tier"] == "AAA"
+    assert "timestamp" in data

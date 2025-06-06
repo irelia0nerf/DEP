@@ -25,6 +25,8 @@ def load_weights() -> Dict[str, int]:
 
 
 def calculate(flags: List[str]) -> Tuple[int, str, float]:
+    """Return score, tier and confidence for a set of flags."""
+
     weights = load_weights()
     score = sum(weights.get(flag, 1) for flag in flags)
     if score >= 80:
