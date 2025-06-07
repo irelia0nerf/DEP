@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import httpx
 from httpx import AsyncClient
+import types
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from main import app  # noqa: E402
@@ -10,6 +11,8 @@ from app.routers.scorelab import router as scorelab_router  # noqa: E402
 from app.routers.mirror_engine import router as mirror_router  # noqa: E402
 from app.routers.sigilmesh import router as sigil_router  # noqa: E402
 from app.routers.compliance import router as compliance_router  # noqa: E402
+from app.services.compliance import compliance  # noqa: E402
+from app.services import sigilmesh  # noqa: E402
 
 app.include_router(scorelab_router)
 app.include_router(mirror_router)
@@ -63,8 +66,9 @@ async def test_analysis_to_nft(monkeypatch):
             "/internal/v1/scorelab/analyze",
             json={"wallet_address": "0x" + "a" * 40},
         )
-    assert resp.status_code == 200
-    analysis = resp.json()
+    assert analysis_resp.status_code == 200
+    analysis = analysis_resp.json()
+    analysis_data = analysis
     assert analysis["wallet"] == "0x" + "a" * 40
 
     # Step 2: Mirror Engine comparison
@@ -77,13 +81,13 @@ async def test_analysis_to_nft(monkeypatch):
     def mock_check(result):
         return result["score"] >= 50
 
-        snapshot_resp = await ac.post(
-            "/internal/v1/mirror/snapshot",
-            json=analysis_data,
-        )
-        assert snapshot_resp.status_code == 200
-        snapshot_data = snapshot_resp.json()
-        assert snapshot_data["snapshot_id"] == "snap1"
+    snapshot_resp = await ac.post(
+        "/internal/v1/mirror/snapshot",
+        json=analysis_data,
+    )
+    assert snapshot_resp.status_code == 200
+    snapshot_data = snapshot_resp.json()
+    assert snapshot_data["snapshot_id"] == "snap1"
 
     # Execute mocked pipeline
     compared = mirror_engine.compare(analysis)
