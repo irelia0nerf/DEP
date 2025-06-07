@@ -10,43 +10,7 @@ async def get_identity(
     *,
     fernet: Optional[Fernet] = None,
 ) -> Dict[str, Any]:
- codex/fix-174-workflow-errors
-
- codex/update-tests-and-fix-imports
-    """Return simulated KYC information for a wallet."""
-
- codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
- main
-    """Return simulated KYC information for ``wallet_address``.
-
-    Parameters
-    ----------
-    wallet_address:
-        Wallet address in hexadecimal format.
-    fernet:
-        Optional :class:`cryptography.fernet.Fernet` instance used to encrypt
-        the returned email.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Dictionary containing ``wallet``, ``verified``, ``kyc_level`` and PII
-        fields.
-
-    A deterministic heuristic based on the last hexadecimal digit defines
-    ``verified`` and ``kyc_level``. Even digits mark the wallet as verified and
-    the value modulo ``3`` (plus one) sets the level. Unverified wallets have
-    level ``0``. The email is derived from the address and encrypted when a
-    ``fernet`` instance is supplied.
-    """
-
- codex/fix-174-workflow-errors
-
-
-    """Return simulated KYC information for a wallet."""
- main
- main
- main
+    """Return simulated KYC information for ``wallet_address``."""
     if not wallet_address:
         return {
             "wallet": wallet_address,
@@ -61,13 +25,10 @@ async def get_identity(
     except ValueError:  # pragma: no cover - invalid hex should rarely happen
         val = 0
 
-    even_digits = set("02468aceACE")
-    is_verified = last in even_digits
+    is_verified = last in "02468aceACE"
     kyc_level = val % 3 + 1 if is_verified else 0
 
-    local_part = (
-        wallet_address[2:] if wallet_address.startswith("0x") else wallet_address
-    )
+    local_part = wallet_address[2:] if wallet_address.startswith("0x") else wallet_address
     email = f"user{local_part}@example.com"
     if fernet:
         email = fernet.encrypt(email.encode()).decode()

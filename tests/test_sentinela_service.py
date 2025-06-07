@@ -1,11 +1,6 @@
-import os
-import sys
+import pytest
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-
-import pytest  # noqa: E402
-from app.services import sentinela  # noqa: E402
+from app.services import sentinela
 
 
 def test_is_flag_trigger():
@@ -18,6 +13,7 @@ async def test_monitor_loop():
     async def gen():
         for g in [10, 60000]:
             yield {"wallet": "0x1", "gas": g}
+
     results = []
     async for evt in sentinela.monitor_loop(gen()):
         results.append(evt)
