@@ -1,22 +1,14 @@
-import sys
-from pathlib import Path
-import httpx
-from httpx import AsyncClient
-import pytest
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from main import app  # noqa: E402
+from src.dfc import register_proposal, simulate_flag_impact
 
 
-@pytest.mark.asyncio
-async def test_proposal_flow():
-    transport = httpx.ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post(
-            "/internal/v1/dfc/proposals",
-            json={"flag": "MIXER_USAGE", "description": "mixers", "user_id": "u1"},
-        )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["proposal_id"]
-    assert data["status"] in {"PENDING", "APPROVED_FOR_STAGING"}
+def test_register_proposal():
+    proposal = register_proposal({"flag": True}, "user1")
+    assert proposal["status"] == "PENDING"
+    assert proposal["user_id"] == "user1"
+
+
+def test_simulate_flag_impact():
+    proposal = {"data": {"flag": True}}
+    impact = simulate_flag_impact(proposal)
+    assert impact["score_shift"] == 1
+
