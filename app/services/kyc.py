@@ -55,7 +55,6 @@ async def get_identity(
 
     verified = val % 2 == 0
     kyc_level = (val % 3) + 1 if verified else 0
-
     email = f"user{wallet_address[-4:]}@example.com"
     if fernet is not None:
         email = fernet.encrypt(email.encode()).decode()

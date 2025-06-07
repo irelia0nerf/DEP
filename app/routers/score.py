@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 from app.models.schemas import WalletData
 from app.services import engine

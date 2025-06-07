@@ -1,7 +1,9 @@
-
 from fastapi import FastAPI
 from app.routers import score
 
+
+from fastapi import FastAPI
+from app.routers import score
 
 app = FastAPI()
 
