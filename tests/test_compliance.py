@@ -1,13 +1,11 @@
 import sys
 from pathlib import Path
-
 import httpx
 import pytest
 from httpx import AsyncClient
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from main import app  # noqa: E402
-
 
 class FakeCursor:
     def __init__(self, docs):

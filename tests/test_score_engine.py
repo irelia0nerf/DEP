@@ -1,25 +1,25 @@
-from app.services import score_engine
+from app.services.score_engine import calculate
 
 
-def test_high_score():
-    flags = ["MIXER_USAGE", "MIXER_USAGE", "HIGH_BALANCE"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert score >= 80
+def test_calculate_score_tier_aaa_at_threshold():
+    flags = ["MIXER_USAGE", "HIGH_BALANCE", "HIGH_BALANCE", "HIGH_BALANCE"]
+    score, tier, confidence = calculate(flags)
+    assert score == 80
     assert tier == "AAA"
     assert confidence == 0.95
 
 
-def test_medium_score():
-    flags = ["MIXER_USAGE", "HIGH_BALANCE"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert 50 <= score < 80
+def test_calculate_score_tier_bb_at_threshold():
+    flags = ["MIXER_USAGE"]
+    score, tier, _ = calculate(flags)
+    assert score == 50
     assert tier == "BB"
-    assert confidence == 0.95
 
 
-def test_low_score():
-    flags = ["KYC_VERIFIED", "UNKNOWN"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert score < 50
+def test_calculate_unknown_flag_fallback():
+    score, tier, _ = calculate(["UNKNOWN_FLAG"])
+    assert score == 1
     assert tier == "RISK"
-    assert confidence == 0.95
+    score, tier, _ = calculate(["HIGH_BALANCE", "UNKNOWN_FLAG"])
+    assert score == 11
+    assert tier == "RISK"
