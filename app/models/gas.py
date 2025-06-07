@@ -1,14 +1,11 @@
-from pydantic import BaseModel
 from typing import List
+from pydantic import BaseModel
 
 
-class GasData(BaseModel):
-    """Gas usage data for analysis."""
-
-    gas_values: List[int]
+class GasCheckRequest(BaseModel):
+    gas_used: List[int]
 
 
-class GasAnalysis(BaseModel):
-    """Result of gas pattern analysis."""
-
-    anomalies: List[str]
+class GasCheckResult(BaseModel):
+    flags: List[str]
+    avg_gas: float

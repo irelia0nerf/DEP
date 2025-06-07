@@ -1,5 +1,6 @@
 from typing import List
-from app.services import kyc, score_engine, sherlock, mirror_engine
+
+from app.services import kyc, score_engine, sherlock, gas_monitor
 from app.utils.db import get_db
 
 
@@ -30,9 +31,9 @@ async def analyze(wallet_address: str) -> dict:
     """
 
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
+    gas_flags = await gas_monitor.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)
-    gas_flags = await gas_monitor.analyze(wallet_address)
-    flags = aggregate_flags(onchain_flags, identity, gas_flags)
+    flags = aggregate_flags(onchain_flags + gas_flags, identity)
     score, tier, confidence = score_engine.calculate(flags)
 
     result = {
