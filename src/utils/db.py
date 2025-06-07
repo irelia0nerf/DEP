@@ -1,3 +1,5 @@
+ codex/substituir-lógica-de-db.py-por-get_db
+
  codex/update-tests-and-fix-imports
 """Database utilities."""
 
@@ -29,23 +31,29 @@ __all__ = ["get_client", "get_db"]
  main
  main
 
+ main
 import os
 from functools import lru_cache
+from motor.motor_asyncio import AsyncIOMotorClient
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 
-
 @lru_cache()
+ codex/substituir-lógica-de-db.py-por-get_db
+def get_client() -> AsyncIOMotorClient:
+
 def get_client():
     """Return a cached Motor client."""
     from motor.motor_asyncio import AsyncIOMotorClient
 
+ main
     return AsyncIOMotorClient(MONGODB_URI)
-
 
 def get_db():
     """Return the default database handle."""
     return get_client().foundlab
+ codex/substituir-lógica-de-db.py-por-get_db
+
  codex/update-tests-and-fix-imports
 
  codex/remove-unused-imports-and-fix-flake8-issues
@@ -57,6 +65,7 @@ def get_db():
 def get_db():
     """Return a database handle (placeholder)."""
     raise NotImplementedError
+ main
  main
  main
  main
