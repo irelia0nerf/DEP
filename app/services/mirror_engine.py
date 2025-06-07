@@ -14,7 +14,8 @@ def snapshot_event(data: Dict) -> Dict:
     previous = _snapshots.get(wallet)
     _snapshots[wallet] = {"score": data["score"], "flags": list(data["flags"])}
     if not previous:
-        return {"wallet": wallet, "delta_score": 0, "added_flags": [], "removed_flags": []}
+        return {"wallet": wallet, "delta_score": 0, "added_flags": [],
+                "removed_flags": []}
     delta_score = data["score"] - previous["score"]
     added_flags = [f for f in data["flags"] if f not in previous["flags"]]
     removed_flags = [f for f in previous["flags"] if f not in data["flags"]]

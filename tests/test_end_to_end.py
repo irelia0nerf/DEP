@@ -35,13 +35,19 @@ async def test_full_analysis_flow(monkeypatch):
 
     dummy_db = DummyDB()
     monkeypatch.setattr(
-        "app.services.sherlock.analyze_wallet",
+        "src.sherlock.analyzer.analyze_wallet",
+        mock_analyze_wallet,
+    )
+    monkeypatch.setattr(
+        "src.scorelab_core.core.analyze_wallet",
         mock_analyze_wallet,
     )
     monkeypatch.setattr("app.services.kyc.get_identity", mock_get_identity)
     monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
     monkeypatch.setattr("app.utils.db.get_db", lambda: dummy_db)
     monkeypatch.setattr("app.services.scorelab_service.get_db", lambda: dummy_db)
+    monkeypatch.setattr("src.utils.db.get_db", lambda: dummy_db)
+    monkeypatch.setattr("src.scorelab_core.core.get_db", lambda: dummy_db)
 
     transport = httpx.ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:

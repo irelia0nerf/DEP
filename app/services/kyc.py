@@ -1,5 +1,3 @@
-
-
 """KYC service module."""
 
 from typing import Dict
@@ -32,4 +30,3 @@ async def get_identity(wallet_address: str) -> Dict[str, bool]:
     even_digits = set("02468aceACE")
     is_verified = wallet_address[-1] in even_digits
     return {"wallet": wallet_address, "verified": is_verified}
-

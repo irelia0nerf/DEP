@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException
 from app.models.scorelab import MintRequest, MintResult
 from app.services import sigilmesh, scorelab_service
@@ -15,4 +14,3 @@ async def mint_nft(request: MintRequest):
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
     return await sigilmesh.mint_reputation_nft(analysis)
-
