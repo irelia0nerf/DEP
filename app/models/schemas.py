@@ -1,3 +1,7 @@
-from src.models.schemas import WalletData
+from pydantic import BaseModel
 
-__all__ = ["WalletData"]
+
+class WalletData(BaseModel):
+    wallet_address: str
+    tx_volume: float
+    age_days: int

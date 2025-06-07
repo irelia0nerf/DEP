@@ -1,5 +1,4 @@
- codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
-"""Wrapper around ``src.utils`` database helpers."""
+"""Database utilities."""
 
 import os
 from functools import lru_cache
@@ -18,11 +17,3 @@ def get_client():
 
 def get_db():
     return get_client().foundlab
-
-"""Database utilities."""
-
-
-def get_db():
-    """Return a database handle (placeholder)."""
-    raise NotImplementedError
- main

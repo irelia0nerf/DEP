@@ -28,7 +28,7 @@ router = APIRouter(prefix="/internal/v1")
     },
 )
 async def analyze(request: AnalysisRequest):
-    """Analyze a wallet and return reputation results.
+    """Analyze a wallet with ScoreLab and return reputation results.
 
     Example
     -------
