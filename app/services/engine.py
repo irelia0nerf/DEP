@@ -13,7 +13,7 @@ def bayes_px(p_e_given_x: float, p_x: float, p_e: float) -> float:
     return max(0.0, min(px, 1.0))
 
 
-async def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
+def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
     """Derive probabilities from wallet data.
 
     A simple heuristic is used purely for demonstration.
@@ -24,9 +24,9 @@ async def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
     return p_e_given_x, p_x, p_e
 
 
-async def calculate_score(data: WalletData) -> dict:
+def calculate_score(data: WalletData) -> dict:
     """Calculate a score for the wallet based on Bayesian inference."""
-    p_e_given_x, p_x, p_e = await compute_probabilities(data)
+    p_e_given_x, p_x, p_e = compute_probabilities(data)
     probability = bayes_px(p_e_given_x, p_x, p_e)
     score = int(probability * 1000)
     if score >= 800:
