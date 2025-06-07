@@ -10,9 +10,7 @@ class MintRequest(BaseModel):
 
 router = APIRouter(prefix="/internal/v1/sigilmesh")
 
-
-@router.post("/mint")
-async def mint(req: MintRequest):
-    """Mint a reputation NFT for a given analysis."""
-
-    return await sigilmesh.mint_reputation_nft(req.analysis)
+    analysis = await scorelab_service.get_analysis(request.wallet_address)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    return await sigilmesh.mint_reputation_nft(analysis)

@@ -1,6 +1,5 @@
+from src.scorelab_core import aggregate_flags, analyze as core_analyze
 from app.utils.db import get_db
-from app.services import sherlock, kyc, score_engine
-from src.scorelab_core import aggregate_flags
 
 __all__ = ["aggregate_flags", "analyze", "get_analysis"]
 
@@ -19,13 +18,6 @@ async def analyze(wallet_address: str) -> dict:
         "tier": tier,
         "confidence": confidence,
     }
-
-    db = get_db()
-    await db.analysis.insert_one(result)
-    diff = await mirror_engine.compare_snapshot(wallet_address, result)
-    await mirror_engine.save_snapshot(result)
-    result["snapshot_diff"] = diff
-    return result
 
 
 async def get_analysis(wallet_address: str) -> dict | None:
