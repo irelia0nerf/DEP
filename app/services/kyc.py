@@ -1,7 +1,6 @@
 """KYC service module."""
 
 from typing import Any, Dict, Optional
-
 from cryptography.fernet import Fernet
 
 
@@ -10,28 +9,7 @@ async def get_identity(
     *,
     fernet: Optional[Fernet] = None,
 ) -> Dict[str, Any]:
- codex/fix-174-workflow-errors
-
- codex/update-tests-and-fix-imports
-    """Return simulated KYC information for a wallet."""
-
- codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
- main
     """Return simulated KYC information for ``wallet_address``.
-
-    Parameters
-    ----------
-    wallet_address:
-        Wallet address in hexadecimal format.
-    fernet:
-        Optional :class:`cryptography.fernet.Fernet` instance used to encrypt
-        the returned email.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Dictionary containing ``wallet``, ``verified``, ``kyc_level`` and PII
-        fields.
 
     A deterministic heuristic based on the last hexadecimal digit defines
     ``verified`` and ``kyc_level``. Even digits mark the wallet as verified and
@@ -40,13 +18,6 @@ async def get_identity(
     ``fernet`` instance is supplied.
     """
 
- codex/fix-174-workflow-errors
-
-
-    """Return simulated KYC information for a wallet."""
- main
- main
- main
     if not wallet_address:
         return {
             "wallet": wallet_address,
