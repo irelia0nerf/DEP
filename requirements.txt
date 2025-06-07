@@ -3,6 +3,11 @@ uvicorn
 motor
 httpx
 pydantic
+ codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
+cryptography
+flake8
+pytest
+
 pytest-asyncio
 cryptography
 flake8>=7.2.0
@@ -11,5 +16,6 @@ coverage
 cryptography
  codex/implement-kyc-logic-and-adjust-tests
 pytest-asyncio
-=======
+
+ main
  main

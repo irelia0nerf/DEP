@@ -1,7 +1,7 @@
 import asyncio
 from fastapi import APIRouter
 codex/remover-duplicação-e-definir-o-modelo-event
-=======
+
 from app.models.sentinela import Event
 from app.services import sentinela
  main
@@ -15,6 +15,12 @@ router = APIRouter(prefix="/internal/v1/sentinela")
 monitor_task: asyncio.Task | None = None
 
 codex/remover-duplicação-e-definir-o-modelo-event
+
+ codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
+class Event(BaseModel):
+    wallet: str | None = None
+    gas: int = 0
+    anomaly: bool = False
 
 @router.post("/start")
 async def start_monitor() -> dict:
@@ -46,9 +52,10 @@ async def stop_monitor() -> dict:
             pass
     monitor_task = None
     return {"status": "stopped"}
+ main
 
 
-=======
+
 main
 @router.post("/check")
 def check_event(event: Event) -> dict:

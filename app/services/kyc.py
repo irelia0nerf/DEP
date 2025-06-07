@@ -52,6 +52,13 @@ async def get_identity(
         val = 0
 
     even_digits = set("02468aceACE")
+ codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
+    is_verified = wallet_address[-1] in even_digits
+
+    kyc_level = (val % 3) + 1 if is_verified else 0
+
+    email = f"user{wallet_address}@example.com"
+
     is_verified = last in even_digits
  codex/implement-kyc-logic-and-adjust-tests
     kyc_level = val % 3 + 1 if is_verified else 0
@@ -59,7 +66,7 @@ async def get_identity(
         wallet_address[2:] if wallet_address.startswith("0x") else wallet_address
     )
     email = f"user{local_part}@example.com"
-=======
+
 
     if is_verified:
         kyc_level = val % 3 + 1
@@ -67,6 +74,7 @@ async def get_identity(
         kyc_level = 0
 
     email = f"user{wallet_address[2:]}@example.com"
+ main
  main
     if fernet:
         email = fernet.encrypt(email.encode()).decode()

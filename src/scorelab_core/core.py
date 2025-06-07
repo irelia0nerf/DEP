@@ -15,8 +15,13 @@ codex/fix-variável-aggregate_flags
     flags = sorted(set(onchain_flags))
  main
     if identity.get("verified"):
+ codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
+        flags.append("KYC_VERIFIED")
+    return flags
+
         flags.add("KYC_VERIFIED")
     return sorted(flags)
+ main
 
 
 async def analyze(wallet_address: str) -> dict:
