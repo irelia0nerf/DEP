@@ -53,15 +53,7 @@ async def get_identity(
     except ValueError:  # pragma: no cover - invalid hex should rarely happen
         val = 0
 
-    verified = val % 2 == 0
-    kyc_level = (val % 3) + 1 if verified else 0
-    email = f"user{wallet_address[-4:]}@example.com"
-    if fernet is not None:
-        email = fernet.encrypt(email.encode()).decode()
-
-    return {
-        "wallet": wallet_address,
-        "verified": verified,
-        "kyc_level": kyc_level,
-        "pii": {"email": email},
-    }
+        
+    even_digits = set("02468aceACE")
+    is_verified = wallet_address[-1] in even_digits
+    return {"wallet": wallet_address, "verified": is_verified}

@@ -1,35 +1,50 @@
-from __future__ import annotations
-
 from datetime import datetime
-from typing import Any, Dict, List
-
 from app.utils.db import get_db
 
 
-async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Save a snapshot of the analysis result in MongoDB."""
-    db = get_db()
-    snapshot = data.copy()
-    snapshot["timestamp"] = datetime.utcnow()
-    await db.snapshots.insert_one(snapshot)
-    return snapshot
+async def save_snapshot(snapshot: dict, db=None) -> None:
+    """Persist an analysis snapshot to MongoDB."""
+    database = db or get_db()
+    if "timestamp" not in snapshot:
+        snapshot["timestamp"] = datetime.utcnow()
+    await database.snapshots.insert_one(snapshot)
 
 
-async def compare_snapshots(wallet: str) -> Dict[str, Any]:
-    """Return the diff between the last two snapshots for a wallet."""
-    db = get_db()
-    cursor = db.snapshots.find({"wallet": wallet}).sort("timestamp", -1)
-    docs: List[Dict[str, Any]] = await cursor.to_list(length=2)
-    if len(docs) < 2:
-        return {}
+async def compare_snapshot(wallet: str, current: dict, db=None) -> dict:
+    """Compare the current snapshot with the last saved one.
 
-    latest, previous = docs[0], docs[1]
-    flags_latest = set(latest.get("flags", []))
-    flags_previous = set(previous.get("flags", []))
+    Parameters
+    ----------
+    wallet:
+        Wallet address of the snapshot.
+    current:
+        Snapshot data produced by the analysis.
+
+    Returns
+    -------
+    dict
+        Dictionary describing score change and flag differences.
+    """
+
+    database = db or get_db()
+    previous = await database.snapshots.find_one(
+        {"wallet": wallet}, sort=[("timestamp", -1)]
+    )
+    if not previous:
+        return {
+            "score_change": 0,
+            "added_flags": list(current.get("flags", [])),
+            "removed_flags": []
+        }
+    added_flags = sorted(
+        set(current.get("flags", [])) - set(previous.get("flags", []))
+    )
+    removed_flags = sorted(
+        set(previous.get("flags", [])) - set(current.get("flags", []))
+    )
+    score_change = current.get("score", 0) - previous.get("score", 0)
     return {
-        "latest": latest,
-        "previous": previous,
-        "score_change": latest.get("score", 0) - previous.get("score", 0),
-        "flags_added": list(flags_latest - flags_previous),
-        "flags_removed": list(flags_previous - flags_latest),
+        "score_change": score_change,
+        "added_flags": added_flags,
+        "removed_flags": removed_flags,
     }
