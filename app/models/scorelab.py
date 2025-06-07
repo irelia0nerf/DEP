@@ -12,3 +12,16 @@ class AnalysisResult(BaseModel):
     score: int
     tier: str
     confidence: float
+
+
+class MintRequest(BaseModel):
+    wallet_address: str
+
+
+class MintResult(BaseModel):
+    wallet: str
+    score: int
+    tier: str
+    flags: List[str]
+    cid: str
+    did: str
