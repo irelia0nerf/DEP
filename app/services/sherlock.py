@@ -1,28 +1,34 @@
 import os
-from typing import List
+import re
+from typing import List, Tuple
 import httpx
 
 BITQUERY_API_URL = "https://api.bitquery.io"
 BITQUERY_API_KEY = os.getenv("BITQUERY_API_KEY")
 
 
-def build_graph_query(wallet_address: str) -> str:
-    return (
-        """
-    {{
-        ethereum {{
-            address(addresses: {{is: \"{addr}\"}}) {{
-                balances {{
-                    currency {{
+ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
+
+
+def build_graph_query(wallet_address: str) -> Tuple[str, dict]:
+    if not ADDRESS_RE.match(wallet_address):
+        raise ValueError("Invalid wallet address")
+
+    query = """
+    query($addr: String!) {
+        ethereum {
+            address(addresses: {is: $addr}) {
+                balances {
+                    currency {
                         symbol
-                    }}
+                    }
                     value
-                }}
-            }}
-        }}
-    }}
-    """.format(addr=wallet_address)
-    )
+                }
+            }
+        }
+    }
+    """
+    return query, {"addr": wallet_address}
 
 
 def detect_patterns(data: dict) -> List[str]:
@@ -43,7 +49,8 @@ async def analyze_wallet(wallet_address: str) -> List[str]:
     """Analyze on-chain data and return reputation flags."""
 
     headers = {"X-API-KEY": BITQUERY_API_KEY} if BITQUERY_API_KEY else {}
-    payload = {"query": build_graph_query(wallet_address)}
+    query, variables = build_graph_query(wallet_address)
+    payload = {"query": query, "variables": variables}
     async with httpx.AsyncClient() as client:
         response = await client.post(BITQUERY_API_URL, json=payload, headers=headers)
     data = response.json()
