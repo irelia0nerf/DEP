@@ -8,15 +8,18 @@ from app.utils.db import get_db
 
 
 def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
+
     """Combine Sherlock flags with KYC information."""
 
     flags = set(onchain_flags)
+
     if identity.get("verified"):
         flags.add("KYC_VERIFIED")
     return sorted(flags)
 
 
 async def analyze(wallet_address: str) -> dict:
+
     """Analyze a wallet and store the result in MongoDB.
 
     Parameters
@@ -29,6 +32,7 @@ async def analyze(wallet_address: str) -> dict:
     dict
         A dictionary containing score and flag information.
     """
+
 
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)
