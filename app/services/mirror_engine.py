@@ -1,34 +1,19 @@
-"""Mirror Engine compares snapshot evolution."""
+from datetime import datetime
+from typing import Any, Dict, List
 
-from __future__ import annotations
-
-from typing import Dict, List
-
-_snapshots: Dict[str, Dict] = {}
+# In-memory snapshot storage
+_SNAPSHOTS: List[Dict[str, Any]] = []
 
 
-def snapshot_event(data: Dict) -> Dict:
-    """Store a snapshot and return difference from previous state."""
+async def snapshot_event(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Store an event snapshot for future audit purposes."""
 
-    wallet = data["wallet"]
-    previous = _snapshots.get(wallet)
-    _snapshots[wallet] = {"score": data["score"], "flags": list(data["flags"])}
-    if not previous:
-        return {"wallet": wallet, "delta_score": 0, "added_flags": [], "removed_flags": []}
-    delta_score = data["score"] - previous["score"]
-    added_flags = [f for f in data["flags"] if f not in previous["flags"]]
-    removed_flags = [f for f in previous["flags"] if f not in data["flags"]]
-    return {
-        "wallet": wallet,
-        "delta_score": delta_score,
-        "added_flags": added_flags,
-        "removed_flags": removed_flags,
-    }
+    snapshot = {"event": event, "timestamp": datetime.utcnow()}
+    _SNAPSHOTS.append(snapshot)
+    return snapshot
 
 
-def get_history(wallet: str) -> List[Dict]:
-    """Retrieve stored history for a wallet."""
+def get_snapshots() -> List[Dict[str, Any]]:
+    """Return all stored snapshots."""
 
-    if wallet in _snapshots:
-        return [{"wallet": wallet, **_snapshots[wallet]}]
-    return []
+    return list(_SNAPSHOTS)

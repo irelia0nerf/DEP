@@ -22,6 +22,9 @@ async def analyze(wallet_address: str) -> dict:
 
     db = get_db()
     await db.analysis.insert_one(result)
+    diff = await mirror_engine.compare_snapshot(wallet_address, result)
+    await mirror_engine.save_snapshot(result)
+    result["snapshot_diff"] = diff
     return result
 
 

@@ -1,19 +1,27 @@
-"""Routers for Dynamic Flag Council operations."""
-
 from fastapi import APIRouter
-from app.models.dfc import FlagProposal, FlagProposalOut
+from pydantic import BaseModel
+
 from app.services import dfc
 
-router = APIRouter(prefix="/internal/v1")
+
+class ProposalRequest(BaseModel):
+    flag: str
+    weight: int
+    user_id: str
 
 
-@router.post("/dfc/proposals", response_model=FlagProposalOut)
-async def propose_flag(proposal: FlagProposal) -> FlagProposalOut:
-    """Submit a flag change proposal and simulate its impact."""
+router = APIRouter(prefix="/internal/v1/dfc")
 
-    record = dfc.register_proposal(proposal.dict(), proposal.user_id)
-    impact = dfc.simulate_flag_impact(record)
-    record.update(impact)
+
+@router.post("/proposals")
+async def propose_flag_change(request: ProposalRequest):
+    """Register a new flag proposal and simulate its impact."""
+
+    proposal = await dfc.register_proposal(
+        {"flag": request.flag, "weight": request.weight}, request.user_id
+    )
+    impact = await dfc.simulate_flag_impact(proposal)
     if impact["score_shift"] > 5:
-        record["status"] = "APPROVED_FOR_STAGING"
-    return FlagProposalOut(**record)
+        proposal["status"] = "APPROVED_FOR_STAGING"
+    proposal["impact"] = impact
+    return proposal

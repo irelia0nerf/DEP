@@ -1,3 +1,3 @@
-# Documentação Confidencial
+# Documento Confidencial
 
-Este documento contém detalhes sensíveis do projeto. Acesso restrito.
+Este arquivo contém informações sensíveis. Uso restrito.
