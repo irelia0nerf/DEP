@@ -11,3 +11,4 @@ async def calculate_score_endpoint(data: WalletData):
     """Return a probability-based score for the wallet."""
     return engine.calculate_score(data)
 
+
