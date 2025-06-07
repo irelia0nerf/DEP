@@ -8,12 +8,8 @@ analyze_wallet = sherlock.analyze_wallet
 
 
 def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
-    """Combine on-chain flags with identity info sorted alphabetically."""
-    unique = []
-    for flag in onchain_flags:
-        if flag not in unique:
-            unique.append(flag)
-    unique.sort()
+    """Combine on-chain flags with identity information."""
+    flags = sorted(set(onchain_flags))
     if identity.get("verified"):
         unique.append("KYC_VERIFIED")
     return unique

@@ -1,5 +1,3 @@
-
-
 """KYC service module."""
 
 from typing import Any, Dict, Optional

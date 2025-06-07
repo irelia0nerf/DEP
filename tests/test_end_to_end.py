@@ -43,22 +43,6 @@ async def test_analysis_to_nft(monkeypatch):
         return {"wallet": data["wallet"], "compliant": True}
 
     monkeypatch.setattr(
-        "app.services.scorelab_service.analyze",
-        mock_analyze,
-    )
-    monkeypatch.setattr(
-        "app.services.mirror_engine.snapshot_analysis",
-        mock_snapshot_analysis,
-    )
-    monkeypatch.setattr(
-        "app.services.sigilmesh.mint_snapshot",
-        mock_mint_snapshot,
-    )
-    monkeypatch.setattr(
-        "app.services.compliance.check_compliance",
-        mock_check_compliance,
-    )
-    monkeypatch.setattr(
         "src.sherlock.analyzer.analyze_wallet",
         mock_analyze_wallet,
     )
@@ -70,6 +54,7 @@ async def test_analysis_to_nft(monkeypatch):
     monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
     monkeypatch.setattr("app.utils.db.get_db", lambda: dummy_db)
     monkeypatch.setattr("app.services.scorelab_service.get_db", lambda: dummy_db)
+    monkeypatch.setattr("src.utils.db.get_db", lambda: dummy_db)
     monkeypatch.setattr("src.scorelab_core.core.get_db", lambda: dummy_db)
 
     transport = httpx.ASGITransport(app=app)

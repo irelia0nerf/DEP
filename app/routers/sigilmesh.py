@@ -1,7 +1,6 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
-
-from app.services import sigilmesh
+from fastapi import APIRouter, HTTPException
+from app.models.scorelab import MintRequest, MintResult
+from app.services import sigilmesh, scorelab_service
 
 
 class MintRequest(BaseModel):
