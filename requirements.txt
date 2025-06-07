@@ -3,3 +3,6 @@ uvicorn
 motor
 httpx
 pydantic
+flake8
+pytest
+coverage
