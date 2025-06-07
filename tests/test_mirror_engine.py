@@ -48,6 +48,7 @@ class FakeDB:
 def override_db():
     return FakeDB()
 
+
 mirror_engine.get_db = override_db
 
 
@@ -61,10 +62,13 @@ async def test_snapshot_event():
 
 @pytest.mark.asyncio
 async def test_compare_snapshots():
-    await mirror_engine.snapshot_event({"wallet": "0x1", "score": 10, "flags": ["a"]})
-    await mirror_engine.snapshot_event({"wallet": "0x1", "score": 15, "flags": ["a", "b"]})
+    await mirror_engine.snapshot_event(
+        {"wallet": "0x1", "score": 10, "flags": ["a"]}
+    )
+    await mirror_engine.snapshot_event(
+        {"wallet": "0x1", "score": 15, "flags": ["a", "b"]}
+    )
     diff = await mirror_engine.compare_snapshots("0x1")
     assert diff["score_change"] == 5
     assert diff["flags_added"] == ["b"]
     assert diff["flags_removed"] == []
-
