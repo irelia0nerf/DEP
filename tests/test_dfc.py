@@ -11,3 +11,4 @@ def test_simulate_flag_impact():
     proposal = {"data": {"flag": True}}
     impact = simulate_flag_impact(proposal)
     assert impact["score_shift"] == 1
+
