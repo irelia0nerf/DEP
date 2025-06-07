@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Any, Dict
 from uuid import uuid4
 
+from . import scorelab_service
+
 
 async def mint_reputation_nft(analysis: Dict[str, Any]) -> Dict[str, Any]:
     """Mint a reputation NFT representing the analysis result."""
@@ -11,6 +13,12 @@ async def mint_reputation_nft(analysis: Dict[str, Any]) -> Dict[str, Any]:
         "token_id": token_id,
         "ipfs_uri": f"ipfs://{token_id}",
         "issued_at": datetime.utcnow(),
-        "analysis": analysis,
+        "metadata": analysis,
     }
     return nft
+
+
+async def get_latest_analysis(wallet_address: str) -> Dict[str, Any] | None:
+    """Proxy to ``scorelab_service.get_analysis`` for router usage."""
+
+    return await scorelab_service.get_analysis(wallet_address)
