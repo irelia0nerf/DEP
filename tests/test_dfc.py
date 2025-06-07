@@ -8,7 +8,10 @@ import pytest  # noqa: E402
 from app.services import dfc  # noqa: E402
 
 
-def test_simulate_flag_impact():
-    proposal = {"data": {"flag": True}}
-    impact = simulate_flag_impact(proposal)
-    assert impact["score_shift"] == 1
+@pytest.mark.asyncio
+async def test_simulate_flag_impact():
+    """Ensure score shift is calculated relative to current weight."""
+
+    proposal = {"flag": "HIGH_BALANCE", "weight": 15}
+    impact = await dfc.simulate_flag_impact(proposal)
+    assert impact["score_shift"] == 5

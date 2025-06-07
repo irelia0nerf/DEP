@@ -11,15 +11,10 @@ def get_db():
 async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
     """Save a snapshot of the analysis result in MongoDB."""
     db = get_db()
-    snapshot = data.copy()
-    snapshot["timestamp"] = datetime.utcnow()
+    snapshot = {"event": data, "timestamp": datetime.utcnow()}
     collection = getattr(db, "snapshots", None)
     if collection is not None:
         await collection.insert_one(snapshot)
-    return snapshot
-
-    snapshot = {"event": event, "timestamp": datetime.utcnow()}
-    _SNAPSHOTS.append(snapshot)
     return snapshot
 
 async def compare_snapshots(wallet: str) -> Dict[str, Any]:
@@ -28,27 +23,23 @@ async def compare_snapshots(wallet: str) -> Dict[str, Any]:
     collection = getattr(db, "snapshots", None)
     if collection is None:
         return {}
-    cursor = collection.find({"wallet": wallet}).sort("timestamp", -1)
-    docs: List[Dict[str, Any]] = await cursor.to_list(length=2)
+
+    cursor = collection.find({}).sort("timestamp", -1)
+    all_docs: List[Dict[str, Any]] = await cursor.to_list(length=None)
+    docs = [d for d in all_docs if d.get("event", {}).get("wallet") == wallet][:2]
     if len(docs) < 2:
         return {}
 
-    wallet = data["wallet"]
-    previous = _snapshots.get(wallet)
-    _snapshots[wallet] = {
-        "score": data["score"],
-        "flags": list(data["flags"]),
-    }
-    if not previous:
-        return {"wallet": wallet, "delta_score": 0, "added_flags": [],
-                "removed_flags": []}
-    delta_score = data["score"] - previous["score"]
-    added_flags = [f for f in data["flags"] if f not in previous["flags"]]
-    removed_flags = [f for f in previous["flags"] if f not in data["flags"]]
+    latest_event = docs[0]["event"]
+    previous_event = docs[1]["event"]
+
+    flags_latest = set(latest_event.get("flags", []))
+    flags_previous = set(previous_event.get("flags", []))
+
     return {
-        "latest": latest,
-        "previous": previous,
-        "score_change": latest.get("score", 0) - previous.get("score", 0),
+        "latest": docs[0],
+        "previous": docs[1],
+        "score_change": latest_event.get("score", 0) - previous_event.get("score", 0),
         "flags_added": list(flags_latest - flags_previous),
         "flags_removed": list(flags_previous - flags_latest),
     }

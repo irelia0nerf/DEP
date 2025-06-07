@@ -2,6 +2,8 @@ import os
 import sys
 import pytest
 
+import pytest
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
 
@@ -48,9 +50,26 @@ def override_db():
     return FakeDB()
 
 
+mirror_engine.get_db = override_db
+
+
 @pytest.mark.asyncio
 async def test_snapshot_event():
     event = {"foo": "bar"}
     snapshot = await mirror_engine.snapshot_event(event)
     assert snapshot["event"] == event
     assert "timestamp" in snapshot
+
+
+@pytest.mark.asyncio
+async def test_compare_snapshots():
+    await mirror_engine.snapshot_event(
+        {"wallet": "0x1", "score": 10, "flags": ["a"]}
+    )
+    await mirror_engine.snapshot_event(
+        {"wallet": "0x1", "score": 15, "flags": ["a", "b"]}
+    )
+    diff = await mirror_engine.compare_snapshots("0x1")
+    assert diff["score_change"] == 5
+    assert diff["flags_added"] == ["b"]
+    assert diff["flags_removed"] == []

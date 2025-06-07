@@ -8,4 +8,4 @@ router = APIRouter(prefix="/score")
 @router.post("/")
 async def calculate_score(data: WalletData):
     """Return a reputation score using ``src`` utilities."""
-    return engine_calculate_score(data)
+    return await engine_calculate_score(data)

@@ -34,4 +34,4 @@ async def test_monitor_reanalyzes_on_event(monkeypatch):
         resp = await ac.post('/internal/v1/sentinela/stop')
         assert resp.status_code == 200
 
-    assert called.get('wallet') == '0xabc'
+    assert analyzed[-1] == '0xabc'

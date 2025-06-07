@@ -1,8 +1,16 @@
 
+ 6gjf82-codex/editar-src/utils/db.py-para-get_db
 """Database helpers using :mod:`motor` and caching connections."""
 
 from functools import lru_cache
 import os
+
+
+"""Wrapper around ``src.utils`` database helpers."""
+ main
+
+import os
+from functools import lru_cache
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 
