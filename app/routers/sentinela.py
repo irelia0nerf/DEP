@@ -4,10 +4,7 @@ from pydantic import BaseModel
 from app.services import sentinela
 
 
-class Event(BaseModel):
-    wallet: str
-    gas: int
-    anomaly: bool | None = None
+router = APIRouter(prefix="/internal/v1/sentinela")
 
 
 router = APIRouter(prefix="/internal/v1/sentinela")

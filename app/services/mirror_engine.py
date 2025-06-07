@@ -1,17 +1,37 @@
 from datetime import datetime
 from typing import Any, Dict, List
 
-# In-memory snapshot storage
-_SNAPSHOTS: List[Dict[str, Any]] = []
+from app.utils import db as db_utils
 
 
-async def snapshot_event(event: Dict[str, Any]) -> Dict[str, Any]:
-    """Store an event snapshot for future audit purposes."""
+def get_db():
+    return db_utils.get_db()
+
+
+async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Save a snapshot of the analysis result in MongoDB."""
+    db = get_db()
+    snapshot = data.copy()
+    snapshot["timestamp"] = datetime.utcnow()
+    collection = getattr(db, "snapshots", None)
+    if collection is not None:
+        await collection.insert_one(snapshot)
+    return snapshot
 
     snapshot = {"event": event, "timestamp": datetime.utcnow()}
     _SNAPSHOTS.append(snapshot)
     return snapshot
 
+async def compare_snapshots(wallet: str) -> Dict[str, Any]:
+    """Return the diff between the last two snapshots for a wallet."""
+    db = get_db()
+    collection = getattr(db, "snapshots", None)
+    if collection is None:
+        return {}
+    cursor = collection.find({"wallet": wallet}).sort("timestamp", -1)
+    docs: List[Dict[str, Any]] = await cursor.to_list(length=2)
+    if len(docs) < 2:
+        return {}
 
     wallet = data["wallet"]
     previous = _snapshots.get(wallet)

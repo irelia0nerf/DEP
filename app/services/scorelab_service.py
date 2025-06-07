@@ -1,7 +1,26 @@
-from src.scorelab_core import aggregate_flags, analyze as core_analyze
+from typing import List
+from app.services import (
+    sherlock,
+    kyc,
+    score_engine,
+    mirror_engine,
+    gas_monitor,
+)
 from app.utils.db import get_db
 
-__all__ = ["aggregate_flags", "analyze", "get_analysis"]
+
+def aggregate_flags(
+    onchain_flags: List[str], identity: dict, gas_flags: List[str] | None = None
+) -> List[str]:
+    """Combine flags from multiple sources."""
+
+    flags = set(onchain_flags)
+    if gas_flags:
+        flags.update(gas_flags)
+    ordered = sorted(flags)
+    if identity.get("verified"):
+        ordered.append("KYC_VERIFIED")
+    return ordered
 
 
 async def analyze(wallet_address: str) -> dict:
