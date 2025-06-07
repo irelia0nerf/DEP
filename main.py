@@ -5,6 +5,7 @@ app = FastAPI()
 
 app.include_router(score.router)
 app.include_router(scorelab.router)
+app.include_router(compliance.router)
 
 
 @app.get("/")

@@ -1,0 +1,4 @@
+{
+  "tiers": ["AAA", "AA", "A", "B", "C"],
+  "default_probability": 0.95
+}

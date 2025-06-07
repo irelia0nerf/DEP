@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-
 import pytest
 import httpx
 from httpx import AsyncClient
