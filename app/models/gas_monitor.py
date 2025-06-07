@@ -8,4 +8,3 @@ class GasCheckRequest(BaseModel):
 
 class GasCheckResult(BaseModel):
     flags: List[str]
-    avg_gas: float

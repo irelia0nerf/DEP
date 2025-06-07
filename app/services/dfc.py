@@ -1,46 +1,32 @@
-"""Dynamic Flag Council service logic."""
+from datetime import datetime
+from typing import Any, Dict, List
+from uuid import uuid4
 
-from __future__ import annotations
+from app.services import score_engine
 
-import uuid
-from typing import Dict, List
-
-_proposals: Dict[str, Dict] = {}
+# In-memory store of proposals for demo purposes
+_PROPOSALS: List[Dict[str, Any]] = []
 
 
-def register_proposal(flag_data: Dict, user_id: str) -> Dict:
-    """Register a flag change proposal.
+async def register_proposal(flag_data: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    """Register a flag proposal and return its stored representation."""
 
-    Args:
-        flag_data: Information about the new flag.
-        user_id: Identifier of the proposing user.
-
-    Returns:
-        Proposal record with generated ID and status.
-    """
-
-    proposal_id = str(uuid.uuid4())
     proposal = {
-        "proposal_id": proposal_id,
+        "id": uuid4().hex,
         "flag": flag_data.get("flag"),
-        "description": flag_data.get("description", ""),
+        "weight": int(flag_data.get("weight", 0)),
         "user_id": user_id,
         "status": "PENDING",
+        "created_at": datetime.utcnow(),
     }
-    _proposals[proposal_id] = proposal
+    _PROPOSALS.append(proposal)
     return proposal
 
 
-def simulate_flag_impact(proposal: Dict) -> Dict[str, float]:
-    """Simulate impact of a proposal on scoring logic."""
+async def simulate_flag_impact(proposal: Dict[str, Any]) -> Dict[str, int]:
+    """Return the expected score shift if the proposal is approved."""
 
-    # Simplistic impact: flags with certain keywords have higher score impact
-    flag = proposal.get("flag", "")
-    score_shift = 10.0 if "mixer" in flag.lower() else 2.0
+    weights = score_engine.load_weights()
+    current = weights.get(proposal["flag"], 0)
+    score_shift = proposal.get("weight", 0) - current
     return {"score_shift": score_shift}
-
-
-def list_proposals() -> List[Dict]:
-    """Return all stored proposals."""
-
-    return list(_proposals.values())

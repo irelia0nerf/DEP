@@ -1,19 +1,16 @@
-"""Analyze gas usage patterns."""
-
-from __future__ import annotations
-
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
-async def analyze_gas(gas_values: List[int]) -> Dict:
-    """Return anomalies based on gas usage statistics."""
+def analyze_gas_usage(gas_prices: List[int]) -> Dict[str, Any]:
+    """Analyze gas price history and return anomaly flags."""
 
-    if not gas_values:
-        return {"anomalies": []}
-    avg = sum(gas_values) / len(gas_values)
-    anomalies: List[str] = []
-    if avg > 150:
-        anomalies.append("HIGH_AVG_GAS")
-    if max(gas_values) - min(gas_values) > 200:
-        anomalies.append("VOLATILE_GAS")
-    return {"anomalies": anomalies}
+    if not gas_prices:
+        return {"average": 0.0, "flags": []}
+
+    average = sum(gas_prices) / len(gas_prices)
+    flags: List[str] = []
+    if max(gas_prices) > average * 2:
+        flags.append("GAS_SPIKE")
+    if all(price < 20 for price in gas_prices):
+        flags.append("LOW_GAS_USAGE")
+    return {"average": average, "flags": flags}

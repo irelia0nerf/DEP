@@ -1,15 +1,20 @@
-"""Endpoints for Gas Monitor."""
+from typing import List
 
 from fastapi import APIRouter
-from app.models.gas import GasData, GasAnalysis
+from pydantic import BaseModel
+
 from app.services import gas_monitor
 
-router = APIRouter(prefix="/internal/v1")
+
+class GasHistory(BaseModel):
+    gas_prices: List[int]
 
 
-@router.post("/gasmonitor/analyze", response_model=GasAnalysis)
-async def analyze_gas(data: GasData) -> GasAnalysis:
-    """Analyze gas usage and return detected anomalies."""
+router = APIRouter(prefix="/internal/v1/gasmonitor")
 
-    result = await gas_monitor.analyze_gas(data.gas_values)
-    return GasAnalysis(**result)
+
+@router.post("/analyze")
+def analyze_gas(history: GasHistory):
+    """Return gas usage analysis for the provided history."""
+
+    return gas_monitor.analyze_gas_usage(history.gas_prices)

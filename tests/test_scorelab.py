@@ -7,9 +7,6 @@ from httpx import AsyncClient
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from main import app  # noqa: E402
-from app.routers.scorelab import router as scorelab_router  # noqa: E402
-
-app.include_router(scorelab_router)
 
 
 @pytest.mark.asyncio
