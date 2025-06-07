@@ -24,7 +24,7 @@ def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
     return p_e_given_x, p_x, p_e
 
 
-def calculate_score(data: WalletData) -> dict:
+async def calculate_score(data: WalletData) -> dict:
     """Calculate a score for the wallet based on Bayesian inference."""
     p_e_given_x, p_x, p_e = compute_probabilities(data)
     probability = bayes_px(p_e_given_x, p_x, p_e)
@@ -40,4 +40,9 @@ def calculate_score(data: WalletData) -> dict:
         flags.append("low_probability")
     if data.tx_volume < 100:
         flags.append("low_activity")
-    return {"score": score, "tier": tier, "probability": probability, "flags": flags}
+    return {
+        "score": score,
+        "tier": tier,
+        "probability": probability,
+        "flags": flags,
+    }

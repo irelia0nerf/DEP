@@ -5,8 +5,12 @@ from app.routers import scorelab
 
 app = FastAPI()
 
+app.include_router(scorelab.router)
 app.include_router(score.router)
 app.include_router(scorelab.router)
+app.include_router(sigilmesh.router)
+
+app.include_router(compliance.router)
 
 
 @app.get("/")
