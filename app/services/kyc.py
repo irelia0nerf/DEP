@@ -54,4 +54,16 @@ async def get_identity(
         
     even_digits = set("02468aceACE")
     is_verified = wallet_address[-1] in even_digits
-    return {"wallet": wallet_address, "verified": is_verified}
+
+    kyc_level = (val % 3) + 1 if is_verified else 0
+
+    email = f"user{wallet_address}@example.com"
+    if fernet:
+        email = fernet.encrypt(email.encode()).decode()
+
+    return {
+        "wallet": wallet_address,
+        "verified": is_verified,
+        "kyc_level": kyc_level,
+        "pii": {"email": email},
+    }

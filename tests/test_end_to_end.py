@@ -63,8 +63,8 @@ async def test_analysis_to_nft(monkeypatch):
             "/internal/v1/scorelab/analyze",
             json={"wallet_address": "0x" + "a" * 40},
         )
-    assert resp.status_code == 200
-    analysis = resp.json()
+    assert analysis_resp.status_code == 200
+    analysis = analysis_resp.json()
     assert analysis["wallet"] == "0x" + "a" * 40
 
     # Step 2: Mirror Engine comparison

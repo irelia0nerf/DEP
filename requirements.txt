@@ -4,3 +4,5 @@ motor
 httpx
 pydantic
 cryptography
+flake8
+pytest

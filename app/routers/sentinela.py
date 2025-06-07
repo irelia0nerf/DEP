@@ -7,7 +7,10 @@ from app.services import sentinela
 router = APIRouter(prefix="/internal/v1/sentinela")
 
 
-router = APIRouter(prefix="/internal/v1/sentinela")
+class Event(BaseModel):
+    wallet: str | None = None
+    gas: int = 0
+    anomaly: bool = False
 
 
 @router.post("/check")
