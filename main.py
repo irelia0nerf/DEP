@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from app.routers import score, scorelab, sigilmesh
 
 
+from fastapi import FastAPI
+from app.routers import score
+
 app = FastAPI()
 
 app.include_router(score.router)

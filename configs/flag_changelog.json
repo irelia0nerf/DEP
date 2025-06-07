@@ -1,0 +1,9 @@
+{
+  "1.0": [
+    "Added new flag: HIGH_BALANCE",
+    "Deprecated flag: LOW_ACTIVITY"
+  ],
+  "1.1": [
+    "Updated thresholds for HIGH_BALANCE"
+  ]
+}
