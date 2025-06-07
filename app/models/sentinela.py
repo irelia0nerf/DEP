@@ -2,11 +2,11 @@ from pydantic import BaseModel
 
 
 class Event(BaseModel):
-    """Generic event monitored by Sentinela."""
+    """Event data monitored by Sentinela."""
 
     wallet: str
-    gas_used: int
-    context: str
+    gas: int = 0
+    anomaly: bool = False
 
 
 class EventResponse(BaseModel):

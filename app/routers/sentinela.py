@@ -1,10 +1,6 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
-
+from app.models.sentinela import Event
 from app.services import sentinela
-
-
-router = APIRouter(prefix="/internal/v1/sentinela")
 
 
 router = APIRouter(prefix="/internal/v1/sentinela")
