@@ -1,5 +1,4 @@
- codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
-"""Wrapper around ``src.utils`` database helpers."""
+"""Database utilities."""
 
 import os
 from functools import lru_cache
@@ -9,20 +8,12 @@ MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 
 @lru_cache()
 def get_client():
-    try:
-        from motor.motor_asyncio import AsyncIOMotorClient
-    except Exception as exc:  # pragma: no cover - optional dependency
-        raise ImportError("motor is required for database operations") from exc
+    """Return a cached Motor client."""
+    from motor.motor_asyncio import AsyncIOMotorClient
+
     return AsyncIOMotorClient(MONGODB_URI)
 
 
 def get_db():
+    """Return the default database handle."""
     return get_client().foundlab
-
-"""Database utilities."""
-
-
-def get_db():
-    """Return a database handle (placeholder)."""
-    raise NotImplementedError
- main
