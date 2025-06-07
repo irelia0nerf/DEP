@@ -28,7 +28,11 @@ router = APIRouter(prefix="/internal/v1")
     },
 )
 async def analyze(request: AnalysisRequest):
+ codex/fix-174-workflow-errors
     """Analyze a wallet with ScoreLab and return its reputation.
+
+    """Analyze a wallet with ScoreLab and return reputation results.
+ main
 
     Example request body::
 

@@ -3,14 +3,24 @@ from typing import Any, Dict, List
 
 from app.utils import db as db_utils
 
+_db_cache = None
+
 
 def get_db():
     return db_utils.get_db()
 
 
+def _ensure_db():
+    """Return a cached database handle."""
+    global _db_cache
+    if _db_cache is None:
+        _db_cache = get_db()
+    return _db_cache
+
+
 async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
     """Save a snapshot of the analysis result in MongoDB."""
-    db = get_db()
+    db = _ensure_db()
     snapshot = {"event": data, "timestamp": datetime.utcnow()}
     collection = getattr(db, "snapshots", None)
     if collection is not None:
@@ -20,7 +30,7 @@ async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
 
 async def compare_snapshots(wallet: str) -> Dict[str, Any]:
     """Return the diff between the last two snapshots for a wallet."""
-    db = get_db()
+    db = _ensure_db()
     collection = getattr(db, "snapshots", None)
     if collection is None:
         return {}

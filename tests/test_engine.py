@@ -1,7 +1,18 @@
 import asyncio
+ codex/fix-174-workflow-errors
 
 from src.services.engine import bayes_px, calculate_score
 from src.models import WalletData
+
+import os
+import sys
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from src.services.engine import bayes_px, calculate_score  # noqa: E402
+from src.models import WalletData  # noqa: E402
+ main
 
 
 def test_bayes_px_bounds():

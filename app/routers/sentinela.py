@@ -6,13 +6,32 @@ from app.services import sentinela, scorelab_service
 from infra import event_bus
 
 router = APIRouter(prefix="/internal/v1/sentinela")
+ codex/update-tests-and-fix-imports
 
 monitor_task: asyncio.Task | None = None
 
 
+monitor_task: asyncio.Task | None = None
+
+ codex/fix-174-workflow-errors
+
+# Background task running the event monitor loop.
+_monitor_task: asyncio.Task | None = None
+ main
+ main
+
+ main
+
 @router.post("/start")
 async def start_monitor() -> dict:
     """Start monitoring wallet activity events."""
+ codex/fix-174-workflow-errors
+
+ codex/update-tests-and-fix-imports
+
+ codex/remove-unused-imports-and-fix-flake8-issues
+ main
+ main
     global monitor_task
     if monitor_task and not monitor_task.done():
         return {"status": "running"}
@@ -29,6 +48,13 @@ async def start_monitor() -> dict:
 @router.post("/stop")
 async def stop_monitor() -> dict:
     """Stop the monitoring task if running."""
+ codex/fix-174-workflow-errors
+
+ codex/update-tests-and-fix-imports
+
+ codex/remove-unused-imports-and-fix-flake8-issues
+ main
+ main
     global monitor_task
     if monitor_task and not monitor_task.done():
         monitor_task.cancel()
@@ -38,8 +64,23 @@ async def stop_monitor() -> dict:
             pass
     monitor_task = None
     return {"status": "stopped"}
+ codex/fix-174-workflow-errors
 
 
+
+ codex/update-tests-and-fix-imports
+
+
+
+ codex/remove-unused-imports-and-fix-flake8-issues
+
+
+
+
+
+ main
+ main
+ main
 @router.post("/check")
 def check_event(event: Event) -> dict:
     """Check whether the given event would trigger a reanalysis."""

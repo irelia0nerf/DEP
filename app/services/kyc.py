@@ -6,8 +6,17 @@ from cryptography.fernet import Fernet
 
 
 async def get_identity(
-    wallet_address: str, *, fernet: Optional[Fernet] = None
+    wallet_address: str,
+    *,
+    fernet: Optional[Fernet] = None,
 ) -> Dict[str, Any]:
+ codex/fix-174-workflow-errors
+
+ codex/update-tests-and-fix-imports
+    """Return simulated KYC information for a wallet."""
+
+ codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
+ main
     """Return simulated KYC information for ``wallet_address``.
 
     Parameters
@@ -31,6 +40,13 @@ async def get_identity(
     ``fernet`` instance is supplied.
     """
 
+ codex/fix-174-workflow-errors
+
+
+    """Return simulated KYC information for a wallet."""
+ main
+ main
+ main
     if not wallet_address:
         return {
             "wallet": wallet_address,
