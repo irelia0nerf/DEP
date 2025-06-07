@@ -61,9 +61,15 @@ async def test_full_analysis_flow(monkeypatch):
             "/internal/v1/scorelab/analyze",
             json={"wallet_address": wallet},
         )
+ codex/remover-duplicação-e-definir-o-modelo-event
     assert resp.status_code == 200
     analysis = resp.json()
     assert analysis["wallet"] == wallet
+=======
+    assert analysis_resp.status_code == 200
+    analysis = analysis_resp.json()
+    assert analysis["wallet"] == "0x" + "a" * 40
+ main
 
     # Step 2: Mirror Engine comparison
     def mock_compare(current):
