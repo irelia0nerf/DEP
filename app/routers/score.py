@@ -11,10 +11,10 @@ router = APIRouter(prefix="/score")
 @router.post(
     "/",
     tags=["Score"],
-    response_model=dict,
+    description="Calculate a wallet risk score",
     responses={
         200: {
-            "description": "Calculated score information",
+            "description": "Score calculation result",
             "content": {
                 "application/json": {
                     "example": {
@@ -28,7 +28,5 @@ router = APIRouter(prefix="/score")
         }
     },
 )
-def calculate_score(data: WalletData):
-    """Calculate a score for the wallet using the engine service."""
-
-    return engine.calculate_score(data)
+async def calculate_score(data: WalletData):
+    return await engine.calculate_score(data)

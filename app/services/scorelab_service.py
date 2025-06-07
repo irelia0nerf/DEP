@@ -1,39 +1,15 @@
-from typing import List
-
-from app.services import kyc, score_engine, sherlock, gas_monitor
 from app.utils.db import get_db
+from app.services import sherlock, kyc, score_engine
+from src.scorelab_core import aggregate_flags
 
-
-def aggregate_flags(
-    onchain_flags: List[str], identity: dict, gas_flags: List[str]
-) -> List[str]:
-    """Combine flags from multiple sources."""
-
-    flags = list(set(onchain_flags + gas_flags))
-    if identity.get("verified"):
-        flags.append("KYC_VERIFIED")
-    return flags
+__all__ = ["aggregate_flags", "analyze", "get_analysis"]
 
 
 async def analyze(wallet_address: str) -> dict:
-
-    """Analyze a wallet and store the result in MongoDB.
-
-    Parameters
-    ----------
-    wallet_address:
-        Address of the wallet being analyzed.
-
-    Returns
-    -------
-    dict
-        A dictionary containing score and flag information.
-    """
-
+    """Run a ScoreLab analysis and persist the result."""
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
-    gas_flags = await gas_monitor.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)
-    flags = aggregate_flags(onchain_flags + gas_flags, identity)
+    flags = aggregate_flags(onchain_flags, identity)
     score, tier, confidence = score_engine.calculate(flags)
 
     result = {
@@ -53,8 +29,6 @@ async def analyze(wallet_address: str) -> dict:
 
 
 async def get_analysis(wallet_address: str) -> dict | None:
-    """Retrieve the latest analysis for a wallet from MongoDB."""
-
+    """Retrieve the latest analysis for a wallet."""
     db = get_db()
-    doc = await db.analysis.find_one({"wallet": wallet_address}, {"_id": 0})
-    return doc
+    return await db.analysis.find_one({"wallet": wallet_address}, {"_id": 0})
