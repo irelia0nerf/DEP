@@ -18,4 +18,3 @@ async def mint_nft(request: MintRequest) -> MintResult:
         raise HTTPException(status_code=404, detail="Analysis not found")
 
     return await sigilmesh.mint_reputation_nft(analysis)
-
