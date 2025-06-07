@@ -1,5 +1,8 @@
 
-"""Wrapper around ``src.utils`` database helpers."""
+"""Database helpers using :mod:`motor` and caching connections."""
+
+from functools import lru_cache
+import os
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 
