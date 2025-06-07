@@ -1,11 +1,35 @@
-from src.scorelab_core import aggregate_flags, analyze as core_analyze
+from typing import List
+from app.services import sherlock, kyc, score_engine, gas_monitor
+from app.utils.db import get_db
 
-__all__ = ["aggregate_flags", "analyze"]
+
+def aggregate_flags(
+    onchain_flags: List[str], identity: dict, gas_flags: List[str]
+) -> List[str]:
+    """Combine flags from multiple sources."""
+
+    flags = list(set(onchain_flags + gas_flags))
+    if identity.get("verified"):
+        flags.append("KYC_VERIFIED")
+    return flags
 
 
 async def analyze(wallet_address: str) -> dict:
-    """Proxy to scorelab_core.analyze."""
-    return await core_analyze(wallet_address)
+    """Analyze a wallet and store the result in MongoDB."""
+
+    onchain_flags = await sherlock.analyze_wallet(wallet_address)
+    identity = await kyc.get_identity(wallet_address)
+    gas_flags = await gas_monitor.analyze(wallet_address)
+    flags = aggregate_flags(onchain_flags, identity, gas_flags)
+    score, tier, confidence = score_engine.calculate(flags)
+
+    result = {
+        "wallet": wallet_address,
+        "flags": flags,
+        "score": score,
+        "tier": tier,
+        "confidence": confidence,
+    }
 
     db = get_db()
     await db.analysis.insert_one(result)
