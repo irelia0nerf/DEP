@@ -29,7 +29,6 @@ async def analyze(wallet_address: str) -> dict:
     dict
         A dictionary containing score and flag information.
     """
-
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
     gas_flags = await gas_monitor.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)

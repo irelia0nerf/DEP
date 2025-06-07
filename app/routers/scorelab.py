@@ -7,19 +7,20 @@ router = APIRouter(prefix="/internal/v1")
 
 @router.post(
     "/scorelab/analyze",
-    response_model=AnalysisResult,
     tags=["ScoreLab"],
+    response_model=AnalysisResult,
     responses={
         200: {
-            "description": "Detailed reputation analysis",
+            "description": "Analysis result",
             "content": {
                 "application/json": {
                     "example": {
-                        "wallet": "0x123",
+                        "wallet": "0xabc",
                         "flags": ["MOCK_FLAG"],
                         "score": 90,
                         "tier": "AAA",
                         "confidence": 0.99,
+                        "timestamp": "2024-01-01T00:00:00Z",
                     }
                 }
             },
@@ -27,12 +28,14 @@ router = APIRouter(prefix="/internal/v1")
     },
 )
 async def analyze(request: AnalysisRequest):
-    """Analyze a wallet with ScoreLab and return its reputation.
+    """Analyze a wallet and return reputation results.
 
-    Example request body::
+    Example
+    -------
+    Request payload::
 
         {
-            "wallet_address": "0x123"
+            "wallet_address": "0xabc"
         }
     """
 
