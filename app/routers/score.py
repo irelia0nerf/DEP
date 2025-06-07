@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.models.schemas import WalletData
 
+
 router = APIRouter(prefix="/score")
 
 
