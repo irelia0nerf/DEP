@@ -24,6 +24,7 @@ async def test_get_identity_unverified_level_zero():
     assert result["wallet"] == "0x1235"
     assert result["verified"] is False
     assert result["kyc_level"] == 0
+    assert result["pii"]["email"] == "user1235@example.com"
 
 
 @pytest.mark.asyncio
