@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import httpx
 from httpx import AsyncClient
+import types
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from main import app  # noqa: E402
@@ -10,6 +11,8 @@ from app.routers.scorelab import router as scorelab_router  # noqa: E402
 from app.routers.mirror_engine import router as mirror_router  # noqa: E402
 from app.routers.sigilmesh import router as sigil_router  # noqa: E402
 from app.routers.compliance import router as compliance_router  # noqa: E402
+from app.services.compliance import compliance  # noqa: E402
+from app.services import sigilmesh  # noqa: E402
 
 app.include_router(scorelab_router)
 app.include_router(mirror_router)
