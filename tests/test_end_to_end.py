@@ -38,20 +38,29 @@ async def test_full_analysis_flow(monkeypatch):
         "app.services.sherlock.analyze_wallet",
         mock_analyze_wallet,
     )
+    monkeypatch.setattr(
+        "src.sherlock.analyzer.analyze_wallet",
+        mock_analyze_wallet,
+    )
+    monkeypatch.setattr(
+        "src.scorelab_core.core.analyze_wallet",
+        mock_analyze_wallet,
+    )
     monkeypatch.setattr("app.services.kyc.get_identity", mock_get_identity)
     monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
     monkeypatch.setattr("app.utils.db.get_db", lambda: dummy_db)
     monkeypatch.setattr("app.services.scorelab_service.get_db", lambda: dummy_db)
+    monkeypatch.setattr("src.scorelab_core.core.get_db", lambda: dummy_db)
 
     transport = httpx.ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         resp = await ac.post(
             "/internal/v1/scorelab/analyze",
-            json={"wallet_address": "0xabc"},
+            json={"wallet_address": "0x" + "a" * 40},
         )
     assert resp.status_code == 200
     analysis = resp.json()
-    assert analysis["wallet"] == "0xabc"
+    assert analysis["wallet"] == "0x" + "a" * 40
 
     # Step 2: Mirror Engine comparison
     def mock_compare(current):
@@ -76,4 +85,4 @@ async def test_full_analysis_flow(monkeypatch):
     assert compared["delta"] == 0
     assert compliance.check(compared)
     nft = sigilmesh.mint_reputation_nft(compared)
-    assert nft["wallet"] == "0xabc"
+    assert nft["wallet"] == "0x" + "a" * 40
