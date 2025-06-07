@@ -1,12 +1,12 @@
-
 from fastapi import APIRouter
-from src.models import WalletData
+from app.models.schemas import WalletData
 from app.services import engine
+
 
 router = APIRouter(prefix="/score")
 
 
 @router.post("/")
-async def calculate_score(data: WalletData):
-    """Return a reputation score calculated via Bayesian inference."""
+def calculate_score(data: WalletData):
+    """Return a reputation score for the given wallet."""
     return engine.calculate_score(data)
