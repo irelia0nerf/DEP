@@ -21,8 +21,10 @@ def compute_probabilities(data: WalletData) -> tuple[float, float, float]:
     return p_e_given_x, p_x, p_e
 
 
-def calculate_score(data: WalletData) -> dict:
+async def calculate_score(data: WalletData) -> dict:
     """Calculate a score for the wallet based on Bayesian inference."""
+    # Computation itself is synchronous but exposed via ``async`` for
+    # compatibility with async service layers.
     p_e_given_x, p_x, p_e = compute_probabilities(data)
     probability = bayes_px(p_e_given_x, p_x, p_e)
     score = int(probability * 1000)
