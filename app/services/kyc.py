@@ -10,10 +10,13 @@ async def get_identity(
     *,
     fernet: Optional[Fernet] = None,
 ) -> Dict[str, Any]:
+ codex/fix-174-workflow-errors
+
  codex/update-tests-and-fix-imports
     """Return simulated KYC information for a wallet."""
 
  codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
+ main
     """Return simulated KYC information for ``wallet_address``.
 
     Parameters
@@ -37,8 +40,11 @@ async def get_identity(
     ``fernet`` instance is supplied.
     """
 
+ codex/fix-174-workflow-errors
+
 
     """Return simulated KYC information for a wallet."""
+ main
  main
  main
     if not wallet_address:
@@ -52,7 +58,7 @@ async def get_identity(
     last = wallet_address[-1]
     try:
         val = int(last, 16)
-    except ValueError:  # pragma: no cover
+    except ValueError:  # pragma: no cover - invalid hex should rarely happen
         val = 0
 
     even_digits = set("02468aceACE")

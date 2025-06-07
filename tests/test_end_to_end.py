@@ -1,23 +1,32 @@
+ codex/fix-174-workflow-errors
+
 import sys
 from pathlib import Path
+ main
 import types
 
 import pytest
 import httpx
 from fastapi import FastAPI
 from httpx import AsyncClient
-import types
+
+ codex/fix-174-workflow-errors
+# Create a minimal app for testing
+from app.routers import scorelab  # noqa: E402
 
 from app.routers.scorelab import router as scorelab_router
 from app.routers.mirror_engine import router as mirror_router
 from app.routers.sigilmesh import router as sigil_router
 from app.routers.compliance import router as compliance_router
 from app.services import compliance, sigilmesh
+ main
 
 app = FastAPI()
  codex/update-tests-and-fix-imports
 
 app.include_router(scorelab.router)
+
+ codex/fix-174-workflow-errors
 
 # Ensure app import path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
@@ -57,14 +66,19 @@ app.include_router(compliance_router)
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
+ main
 
 @pytest.mark.asyncio
 async def test_full_analysis_flow(monkeypatch):
     """Simulate analysis to NFT minting with patched services."""
 
+ codex/fix-174-workflow-errors
+    # Step 1: patch ScoreLab dependencies
+
     assert hasattr(compliance, "evaluate")
     assert hasattr(sigilmesh, "mint_reputation_nft")
 
+ main
     async def mock_analyze_wallet(addr: str):
         return ["MIXER_USAGE"]
 
@@ -83,7 +97,14 @@ async def test_full_analysis_flow(monkeypatch):
             self.analysis = DummyColl()
 
     dummy_db = DummyDB()
+ codex/fix-174-workflow-errors
+    monkeypatch.setattr(
+        "app.services.sherlock.analyze_wallet",
+        mock_analyze_wallet,
+    )
+
     monkeypatch.setattr("app.services.sherlock.analyze_wallet", mock_analyze_wallet)
+ main
     monkeypatch.setattr("app.services.kyc.get_identity", mock_get_identity)
     monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
     monkeypatch.setattr("app.utils.db.get_db", lambda: dummy_db)
@@ -95,10 +116,18 @@ async def test_full_analysis_flow(monkeypatch):
             "/internal/v1/scorelab/analyze",
             json={"wallet_address": "0xabc"},
         )
+ codex/fix-174-workflow-errors
+    assert resp.status_code == 200
+    analysis = resp.json()
+    assert analysis["wallet"] == "0xabc"
+
+    # Step 2: Mirror Engine comparison
+
     assert analysis_resp.status_code == 200
     analysis = analysis_resp.json()
     assert analysis["wallet"] == "0xabc"
 
+ main
     def mock_compare(current):
         return {"delta": 0, **current}
 
@@ -107,15 +136,28 @@ async def test_full_analysis_flow(monkeypatch):
     def mock_check(result):
         return result["score"] >= 50
 
+ codex/fix-174-workflow-errors
+    compliance = types.SimpleNamespace(check=mock_check)
+
     mock_compliance = types.SimpleNamespace(check=mock_check)
+ main
 
     def mock_mint(data):
         return {"token_id": "1", "wallet": data["wallet"]}
 
+ codex/fix-174-workflow-errors
+    sigilmesh = types.SimpleNamespace(mint_reputation_nft=mock_mint)
+
     mock_sigilmesh = types.SimpleNamespace(mint_reputation_nft=mock_mint)
+ main
 
     compared = mirror_engine.compare(analysis)
     assert compared["delta"] == 0
+ codex/fix-174-workflow-errors
+    assert compliance.check(compared)
+    nft = sigilmesh.mint_reputation_nft(compared)
+
     assert mock_compliance.check(compared)
     nft = mock_sigilmesh.mint_reputation_nft(compared)
+ main
     assert nft["wallet"] == "0xabc"

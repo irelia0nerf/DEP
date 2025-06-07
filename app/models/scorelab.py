@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from datetime import datetime
 from typing import List
+from pydantic import BaseModel
 
 
 class AnalysisRequest(BaseModel):
@@ -19,9 +20,7 @@ class MintRequest(BaseModel):
 
 
 class MintResult(BaseModel):
-    wallet: str
-    score: int
-    tier: str
-    flags: List[str]
-    cid: str
-    did: str
+    token_id: int | str
+    metadata: dict
+    ipfs_uri: str | None = None
+    issued_at: datetime | None = None
