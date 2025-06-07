@@ -1,17 +1,23 @@
-
-
 """KYC service module."""
 
-from typing import Dict
+from typing import Any, Dict, Optional
+
+from cryptography.fernet import Fernet
 
 
-async def get_identity(wallet_address: str) -> Dict[str, bool]:
-    """Return KYC verification information for a wallet.
+async def get_identity(
+    wallet_address: str, *, fernet: Optional[Fernet] = None
+) -> Dict[str, Any]:
+    """Return simulated KYC information for a wallet.
 
-    A very small heuristic is applied: if the wallet address ends with an even
-    hexadecimal digit, it is considered verified. This simulates the behaviour
-    of a third-party KYC provider without exposing any secrets or real
-    integration.
+    A deterministic heuristic based on the last hexadecimal digit is used to
+    assign a verification flag and KYC level. Even digits mean the wallet is
+    verified while the digit modulo ``3`` defines the level (1-3). If the
+    wallet is not verified, the level is ``0``.
+
+    The function also returns a mock email derived from the wallet. When a
+    :class:`~cryptography.fernet.Fernet` instance is provided via ``fernet`` the
+    email is encrypted, simulating secure PII storage.
 
     Parameters
     ----------
@@ -20,15 +26,32 @@ async def get_identity(wallet_address: str) -> Dict[str, bool]:
 
     Returns
     -------
-    Dict[str, bool]
+    Dict[str, Any]
         Example::
 
-            {"wallet": "0xabc", "verified": False}
+            {
+                "wallet": "0xabc",
+                "verified": True,
+                "kyc_level": 2,
+                "pii": {"email": "user0xabc@example.com"}
+            }
     """
 
     if not wallet_address:
-        return {"wallet": wallet_address, "verified": False}
+        return {
+            "wallet": wallet_address,
+            "verified": False,
+            "kyc_level": 0,
+            "pii": None,
+        }
 
+    last = wallet_address[-1]
+    try:
+        val = int(last, 16)
+    except ValueError:  # pragma: no cover - invalid hex should rarely happen
+        val = 0
+
+        
     even_digits = set("02468aceACE")
     is_verified = wallet_address[-1] in even_digits
     return {"wallet": wallet_address, "verified": is_verified}

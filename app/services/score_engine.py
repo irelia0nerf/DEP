@@ -21,7 +21,14 @@ def load_weights() -> Dict[str, int]:
                 return {str(k): int(v) for k, v in data.items()}
         except Exception:  # pragma: no cover - fallback
             pass
-    return {"HIGH_BALANCE": 10, "MIXER_USAGE": 50, "KYC_VERIFIED": -5}
+    return {
+        "HIGH_BALANCE": 10,
+        "MIXER_USAGE": 50,
+        "KYC_VERIFIED": -5,
+        "HIGH_AVG_GAS": 20,
+        "GAS_SPIKE": 25,
+        "EXTREME_GAS_USAGE": 30,
+    }
 
 
 def calculate(flags: List[str]) -> Tuple[int, str, float]:

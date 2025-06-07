@@ -1,25 +1,16 @@
-from typing import List
+from typing import Any, Dict, List
 
 
-def detect_anomalies(gas_values: List[int]) -> List[str]:
-    """Return gas usage anomaly flags from a list of gas values."""
+def analyze_gas_usage(gas_prices: List[int]) -> Dict[str, Any]:
+    """Analyze gas price history and return anomaly flags."""
+
+    if not gas_prices:
+        return {"average": 0.0, "flags": []}
+
+    average = sum(gas_prices) / len(gas_prices)
     flags: List[str] = []
-    if not gas_values:
-        return flags
-
-    avg = sum(gas_values) / len(gas_values)
-    if avg > 150_000:
-        flags.append("HIGH_GAS_AVG")
-
-    for value in gas_values:
-        if value > 200_000 and value > avg * 1.5:
-            flags.append("GAS_SPIKE")
-            break
-
-    return flags
-
-
-async def analyze(wallet_address: str) -> List[str]:
-    """Simulate gas analysis for a wallet."""
-    sample_usage = [21_000, 22_000, 300_000]
-    return detect_anomalies(sample_usage)
+    if max(gas_prices) > average * 2:
+        flags.append("GAS_SPIKE")
+    if all(price < 20 for price in gas_prices):
+        flags.append("LOW_GAS_USAGE")
+    return {"average": average, "flags": flags}
