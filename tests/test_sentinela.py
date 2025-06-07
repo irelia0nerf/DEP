@@ -22,11 +22,11 @@ async def test_event_triggers_reanalysis(monkeypatch):
     monkeypatch.setattr('app.services.scorelab_service.analyze', mock_analyze)
     transport = httpx.ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url='http://test') as ac:
-        resp = await ac.post('/sentinela/start')
+        resp = await ac.post('/internal/v1/sentinela/start')
         assert resp.status_code == 200
         await event_bus.publish_event('wallet.activity', {'wallet_address': '0xabc'})
         await asyncio.sleep(0.05)
-        resp = await ac.post('/sentinela/stop')
+        resp = await ac.post('/internal/v1/sentinela/stop')
         assert resp.status_code == 200
 
     assert called.get('wallet') == '0xabc'

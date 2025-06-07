@@ -25,17 +25,7 @@ router = APIRouter(prefix="/score")
         }
     },
 )
-def calculate_score(data: WalletData):
-    """Calculate a wallet risk score using basic heuristics.
+async def calculate_score(data: WalletData):
+    """Calculate a wallet risk score using the engine."""
 
-    Example request body::
-
-        {
-            "wallet_address": "0xabc",
-            "tx_volume": 1200,
-            "age_days": 365
-        }
-    """
-
-    # mock score
-    return {"score": 752, "tier": "B", "flags": ["mixer_usage", "low_activity"]}
+    return await engine.calculate_score(data)

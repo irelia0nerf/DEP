@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from app.infra import event_bus
 from app.services import sentinela as sentinela_service
 
-router = APIRouter(prefix="/sentinela")
+router = APIRouter(prefix="/internal/v1/sentinela")
 
 _monitor_task: asyncio.Task | None = None
 
