@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
-
 from src.scorelab_core.router import router as scorelab_core_router
 from src.dfc.router import router as dfc_router
 from src.sherlock.router import router as sherlock_router

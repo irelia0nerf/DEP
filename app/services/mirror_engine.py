@@ -1,35 +1,35 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any, Dict, List
 
-from app.utils.db import get_db
+# In-memory snapshot storage
+_SNAPSHOTS: List[Dict[str, Any]] = []
 
 
-async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Save a snapshot of the analysis result in MongoDB."""
-    db = get_db()
-    snapshot = data.copy()
-    snapshot["timestamp"] = datetime.utcnow()
-    await db.snapshots.insert_one(snapshot)
+async def snapshot_event(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Store an event snapshot for future audit purposes."""
+
+    snapshot = {"event": event, "timestamp": datetime.utcnow()}
+    _SNAPSHOTS.append(snapshot)
     return snapshot
 
 
-async def compare_snapshots(wallet: str) -> Dict[str, Any]:
-    """Return the diff between the last two snapshots for a wallet."""
-    db = get_db()
-    cursor = db.snapshots.find({"wallet": wallet}).sort("timestamp", -1)
-    docs: List[Dict[str, Any]] = await cursor.to_list(length=2)
-    if len(docs) < 2:
-        return {}
-
-    latest, previous = docs[0], docs[1]
-    flags_latest = set(latest.get("flags", []))
-    flags_previous = set(previous.get("flags", []))
-    return {
-        "latest": latest,
-        "previous": previous,
-        "score_change": latest.get("score", 0) - previous.get("score", 0),
-        "flags_added": list(flags_latest - flags_previous),
-        "flags_removed": list(flags_previous - flags_latest),
+    wallet = data["wallet"]
+    previous = _snapshots.get(wallet)
+    _snapshots[wallet] = {
+        "score": data["score"],
+        "flags": list(data["flags"]),
     }
+    if not previous:
+        return {"wallet": wallet, "delta_score": 0, "added_flags": [],
+                "removed_flags": []}
+    delta_score = data["score"] - previous["score"]
+    added_flags = [f for f in data["flags"] if f not in previous["flags"]]
+    removed_flags = [f for f in previous["flags"] if f not in data["flags"]]
+    return {
+        "wallet": wallet,
+        "delta_score": delta_score,
+        "added_flags": added_flags,
+        "removed_flags": removed_flags,
+    }
+
+    return list(_SNAPSHOTS)

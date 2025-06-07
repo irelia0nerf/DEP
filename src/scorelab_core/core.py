@@ -1,16 +1,18 @@
 from typing import List
 
-from app.services import kyc, score_engine
-from src.sherlock.analyzer import analyze_wallet
+from app.services import kyc, score_engine, sherlock
 from src.utils.db import get_db
+
+# expose analyze_wallet for testing hooks
+analyze_wallet = sherlock.analyze_wallet
 
 
 def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
     """Combine on-chain flags with identity information."""
-    flags = list(set(onchain_flags))
+    flags = sorted(set(onchain_flags))
     if identity.get("verified"):
-        flags.append("KYC_VERIFIED")
-    return flags
+        unique.append("KYC_VERIFIED")
+    return unique
 
 
 async def analyze(wallet_address: str) -> dict:

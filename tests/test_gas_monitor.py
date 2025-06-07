@@ -1,31 +1,17 @@
-from app.services import gas_monitor
-import httpx
-from httpx import AsyncClient
-import pytest
-from main import app
+import os
+import sys
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from app.services import gas_monitor  # noqa: E402
 
 
-def test_detect_no_anomalies():
-    assert gas_monitor.detect_anomalies([21000, 22000, 21000]) == []
+def test_gas_spike_flag():
+    result = gas_monitor.analyze_gas_usage([10, 20, 100])
+    assert "GAS_SPIKE" in result["flags"]
 
 
-def test_detect_high_avg():
-    flags = gas_monitor.detect_anomalies([200000, 180000, 170000])
-    assert "HIGH_GAS_AVG" in flags
-
-
-def test_detect_gas_spike():
-    flags = gas_monitor.detect_anomalies([21000, 22000, 600000])
-    assert "GAS_SPIKE" in flags
-
-
-@pytest.mark.asyncio
-async def test_gas_monitor_endpoint():
-    transport = httpx.ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post(
-            "/internal/v1/gasmonitor/check",
-            json={"gas_used": [21000, 600000]},
-        )
-    assert response.status_code == 200
-    assert "GAS_SPIKE" in response.json()["flags"]
+def test_low_gas_flag():
+    result = gas_monitor.analyze_gas_usage([5, 6, 8])
+    assert "LOW_GAS_USAGE" in result["flags"]

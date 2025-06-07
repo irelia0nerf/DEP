@@ -1,8 +1,9 @@
+
 from fastapi import APIRouter
+
+
 from app.models.schemas import WalletData
 from app.services import engine
-
-
 
 router = APIRouter(prefix="/score")
 
@@ -10,14 +11,16 @@ router = APIRouter(prefix="/score")
 @router.post(
     "/",
     tags=["Score"],
+    description="Calculate a wallet risk score",
     responses={
         200: {
-            "description": "Score computed successfully",
+            "description": "Score calculation result",
             "content": {
                 "application/json": {
                     "example": {
                         "score": 752,
                         "tier": "B",
+                        "probability": 0.75,
                         "flags": ["mixer_usage", "low_activity"],
                     }
                 }
@@ -25,7 +28,7 @@ router = APIRouter(prefix="/score")
         }
     },
 )
-def calculate_score(data: WalletData):
+async def calculate_score(data: WalletData):
     """Calculate a wallet risk score using basic heuristics.
 
     Example request body::
@@ -36,6 +39,4 @@ def calculate_score(data: WalletData):
             "age_days": 365
         }
     """
-
-    # mock score
-    return {"score": 752, "tier": "B", "flags": ["mixer_usage", "low_activity"]}
+    return await engine.calculate_score(data)

@@ -1,4 +1,3 @@
-from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 
@@ -15,7 +14,6 @@ class AnalysisResult(BaseModel):
     confidence: float
 
 
-
 class MintRequest(BaseModel):
     wallet_address: str
 
@@ -27,4 +25,3 @@ class MintResult(BaseModel):
     flags: List[str]
     cid: str
     did: str
-
