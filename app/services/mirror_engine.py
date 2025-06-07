@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from app.utils.db import get_db
 
 
