@@ -1,18 +1,12 @@
-import os
-import sys
+import asyncio
+from fastapi.testclient import TestClient
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-
-from fastapi.testclient import TestClient  # noqa: E402
-from app.models.schemas import WalletData  # noqa: E402
-from app.services import engine  # noqa: E402
-import asyncio  # noqa: E402
+from main import app
+from app.models.schemas import WalletData
+from app.services import engine
 
 
 def test_score_endpoint():
-    from main import app  # noqa: E402
-
     data = {"wallet_address": "0xabc", "tx_volume": 1200, "age_days": 365}
     expected = asyncio.run(engine.calculate_score(WalletData(**data)))
 

@@ -1,11 +1,6 @@
-import os
-import sys
+import pytest
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-
-import pytest  # noqa: E402
-from app.services import sigilmesh  # noqa: E402
+from app.services import sigilmesh
 
 
 @pytest.mark.asyncio

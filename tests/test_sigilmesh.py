@@ -1,8 +1,7 @@
 import sys
 from pathlib import Path
-
-import pytest
 import httpx
+import pytest
 from httpx import AsyncClient
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
