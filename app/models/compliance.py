@@ -1,14 +1,19 @@
-from typing import List
+from datetime import datetime
+from typing import Dict, List
+
 from pydantic import BaseModel
 
 
-class ComplianceRequest(BaseModel):
+class ComplianceEvaluationRequest(BaseModel):
     wallet_address: str
+    rules: List[str]
 
 
-class ComplianceResult(BaseModel):
+class ComplianceEvaluationResult(BaseModel):
     wallet: str
-    kyc_verified: bool
-    kyt_flags: List[str]
-    status: str
-    ts: str
+    rules: List[str]
+    results: Dict[str, bool]
+    passed: bool
+    flags: List[str]
+    tier: str
+    timestamp: datetime

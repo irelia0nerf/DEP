@@ -1,42 +1,46 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Dict, List
 
-from app.services import kyc, sherlock
+from app.services import scorelab_service
 from app.utils.db import get_db
 
 
-async def evaluate(wallet_address: str) -> Dict[str, object]:
-    """Evaluate KYC and KYT rules for a wallet and store the result."""
-    identity = await kyc.get_identity(wallet_address)
-    kyt_flags = await sherlock.analyze_wallet(wallet_address)
-    status = "pass" if identity.get("verified") and not kyt_flags else "fail"
+async def evaluate_rules(wallet_address: str, rules: List[str]) -> dict:
+    """Evaluate compliance rules for a wallet and log the result."""
+    analysis = await scorelab_service.analyze(wallet_address)
+    flags = analysis.get("flags", [])
+    tier = analysis.get("tier", "RISK")
 
+    results: Dict[str, bool] = {}
+    for rule in rules:
+        if rule == "kyc_verified":
+            results[rule] = "KYC_VERIFIED" in flags
+        elif rule == "no_mixer":
+            results[rule] = "MIXER_USAGE" not in flags
+        elif rule == "tier_bb_or_higher":
+            results[rule] = tier in ("AAA", "BB")
+        else:
+            results[rule] = False
+
+    passed = all(results.values())
     record = {
         "wallet": wallet_address,
-        "kyc_verified": bool(identity.get("verified")),
-        "kyt_flags": kyt_flags,
-        "status": status,
-        "ts": datetime.utcnow(),
+        "rules": rules,
+        "results": results,
+        "passed": passed,
+        "flags": flags,
+        "tier": tier,
+        "timestamp": datetime.utcnow(),
     }
 
     db = get_db()
     await db.compliance_logs.insert_one(record)
-
-    record["ts"] = record["ts"].isoformat()
     return record
 
 
-async def get_logs(limit: int = 10) -> List[Dict[str, object]]:
-    """Return the most recent compliance evaluation logs."""
+async def get_logs(limit: int = 20) -> List[dict]:
+    """Return recent compliance logs."""
     db = get_db()
-    cursor = (
-        db.compliance_logs.find({}, {"_id": 0}).sort("ts", -1).limit(limit)
-    )
+    cursor = db.compliance_logs.find().sort("timestamp", -1).limit(limit)
     logs = await cursor.to_list(length=limit)
-    for log in logs:
-        ts = log.get("ts")
-        if isinstance(ts, datetime):
-            log["ts"] = ts.isoformat()
     return logs
