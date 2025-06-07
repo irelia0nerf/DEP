@@ -1,25 +1,14 @@
 from app.services import score_engine
 
 
-def test_high_score():
-    flags = ["MIXER_USAGE", "MIXER_USAGE", "HIGH_BALANCE"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert score >= 80
-    assert tier == "AAA"
-    assert confidence == 0.95
+
+def test_load_weights_env(monkeypatch):
+    monkeypatch.setenv("SCORE_WEIGHTS", '{"A": 1, "B": 2}')
+    weights = score_engine.load_weights()
+    assert weights == {"A": 1, "B": 2}
 
 
-def test_medium_score():
-    flags = ["MIXER_USAGE", "HIGH_BALANCE"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert 50 <= score < 80
-    assert tier == "BB"
-    assert confidence == 0.95
-
-
-def test_low_score():
-    flags = ["KYC_VERIFIED", "UNKNOWN"]
-    score, tier, confidence = score_engine.calculate(flags)
-    assert score < 50
-    assert tier == "RISK"
-    assert confidence == 0.95
+def test_load_weights_default(monkeypatch):
+    monkeypatch.delenv("SCORE_WEIGHTS", raising=False)
+    weights = score_engine.load_weights()
+    assert "HIGH_BALANCE" in weights

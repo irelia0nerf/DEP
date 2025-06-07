@@ -20,3 +20,5 @@ def test_score_endpoint():
     assert "score" in payload
     assert "tier" in payload
     assert 0 <= payload["score"] <= 1000
+    assert "probability" in payload
+    assert isinstance(payload["flags"], list)
