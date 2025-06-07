@@ -5,8 +5,9 @@ from app.services import sherlock
 
 def test_build_graph_query_valid():
     address = "0x" + "a" * 40
-    query = sherlock.build_graph_query(address)
-    assert address in query
+    query, variables = sherlock.build_graph_query(address)
+    assert "$addr" in query
+    assert variables["addr"] == address
 
 
 def test_build_graph_query_invalid():
