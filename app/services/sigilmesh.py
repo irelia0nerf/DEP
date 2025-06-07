@@ -1,28 +1,32 @@
-from __future__ import annotations
+"""SigilMesh NFT minting simulation service."""
 
-from typing import Dict, Any
+from datetime import datetime
+from typing import Any, Dict, Optional
+
+from app.utils.db import get_db
+
+
+async def get_latest_analysis(wallet_address: str) -> Optional[Dict[str, Any]]:
+    """Return the most recent analysis for a wallet from MongoDB."""
+    db = get_db()
+    doc = await db.analysis.find_one(
+        {"wallet": wallet_address}, sort=[("timestamp", -1)]
+    )
+    return doc
 
 
 async def mint_reputation_nft(analysis: Dict[str, Any]) -> Dict[str, Any]:
-    """Simulate minting an NFT containing reputation analysis metadata.
-
-    The function mimics storing metadata on IPFS and generating a DID.
-    No external network calls are made. Returned data mirrors what would
-    typically be stored on-chain or via decentralized identifiers.
-    """
-
-    # Placeholder IPFS content identifier and decentralized ID generation
-    ipfs_cid = f"bafy{abs(hash(str(analysis))) % 10000}"
-    did = f"did:example:{ipfs_cid[-6:]}"
-
+    """Simulate minting a reputation NFT from an analysis result."""
     metadata = {
-        "wallet": analysis.get("wallet"),
-        "score": analysis.get("score"),
-        "tier": analysis.get("tier"),
-        "flags": analysis.get("flags", []),
-        "cid": ipfs_cid,
-        "did": did,
+        "wallet": analysis["wallet"],
+        "score": analysis["score"],
+        "tier": analysis["tier"],
+        "flags": analysis["flags"],
+        "timestamp": (
+            analysis["timestamp"].isoformat()
+            if hasattr(analysis["timestamp"], "isoformat")
+            else analysis["timestamp"]
+        ),
     }
-
-    # In a real implementation, minting logic would be executed here
-    return metadata
+    token_id = int(datetime.utcnow().timestamp())
+    return {"token_id": token_id, "metadata": metadata}
