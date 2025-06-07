@@ -24,6 +24,17 @@ async def analyze(wallet_address: str) -> dict:
     flags = aggregate_flags(onchain_flags, identity)
     score, tier, confidence = score_engine.calculate(flags)
 
+    result = {
+        "wallet": wallet_address,
+        "flags": flags,
+        "score": score,
+        "tier": tier,
+        "confidence": confidence,
+    }
+
+    db = get_db()
+    await db.analysis.insert_one(result)
+    return result
 
 async def get_analysis(wallet_address: str) -> dict | None:
     """Retrieve the latest analysis for a wallet."""
