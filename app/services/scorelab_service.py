@@ -6,7 +6,7 @@ from app.utils.db import get_db
 def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
     """Combine on-chain flags with identity information."""
 
-    flags = list(set(onchain_flags))
+    flags = sorted(set(onchain_flags))
     if identity.get("verified"):
         flags.append("KYC_VERIFIED")
     return flags
