@@ -8,7 +8,33 @@ from cryptography.fernet import Fernet
 async def get_identity(
     wallet_address: str, *, fernet: Optional[Fernet] = None
 ) -> Dict[str, Any]:
+ codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
+    """Return simulated KYC information for ``wallet_address``.
+
+    Parameters
+    ----------
+    wallet_address:
+        Wallet address in hexadecimal format.
+    fernet:
+        Optional :class:`cryptography.fernet.Fernet` instance used to encrypt
+        the returned email.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary containing ``wallet``, ``verified``, ``kyc_level`` and PII
+        fields.
+
+    A deterministic heuristic based on the last hexadecimal digit defines
+    ``verified`` and ``kyc_level``. Even digits mark the wallet as verified and
+    the value modulo ``3`` (plus one) sets the level. Unverified wallets have
+    level ``0``. The email is derived from the address and encrypted when a
+    ``fernet`` instance is supplied.
+    """
+
+=======
     """Return simulated KYC information for a wallet."""
+ main
     if not wallet_address:
         return {
             "wallet": wallet_address,
