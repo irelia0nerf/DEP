@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List
 import httpx
 
@@ -6,7 +7,13 @@ BITQUERY_API_URL = "https://api.bitquery.io"
 BITQUERY_API_KEY = os.getenv("BITQUERY_API_KEY")
 
 
+ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
+
+
 def build_graph_query(wallet_address: str) -> str:
+    if not ADDRESS_RE.match(wallet_address):
+        raise ValueError("Invalid wallet address")
+
     return (
         """
     {{

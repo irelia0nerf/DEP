@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 from app.routers import score, scorelab
 
