@@ -6,3 +6,5 @@ pydantic
 flake8
 pytest
 coverage
+cryptography
+pytest-asyncio

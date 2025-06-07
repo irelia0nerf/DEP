@@ -1,12 +1,7 @@
-import os
-import sys
-
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-
-from src.services.engine import bayes_px, calculate_score  # noqa: E402
-from src.models import WalletData  # noqa: E402
 import asyncio
+
+from src.services.engine import bayes_px, calculate_score
+from src.models import WalletData
 
 
 def test_bayes_px_bounds():
