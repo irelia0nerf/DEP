@@ -1,5 +1,5 @@
 from typing import List
-from app.services import sherlock, kyc, score_engine, gas_monitor
+from app.services import sherlock, kyc, score_engine, mirror_engine
 from app.utils.db import get_db
 
 
@@ -33,6 +33,7 @@ async def analyze(wallet_address: str) -> dict:
 
     db = get_db()
     await db.analysis.insert_one(result)
+    await mirror_engine.snapshot_event(result)
     return result
 
 

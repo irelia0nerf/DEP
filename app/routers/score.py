@@ -3,6 +3,7 @@ from app.models.schemas import WalletData
 from app.services import engine
 
 
+
 router = APIRouter(prefix="/score")
 
 

@@ -1,26 +1,65 @@
+import os
 import sys
-from pathlib import Path
-import httpx
-from httpx import AsyncClient
 import pytest
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from main import app  # noqa: E402
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from app.services import mirror_engine
+
+
+class FakeCollection:
+    def __init__(self):
+        self.docs = []
+
+    async def insert_one(self, doc):
+        self.docs.append(doc)
+
+    def find(self, query):
+        matching = [
+            d
+            for d in self.docs
+            if all(d.get(k) == v for k, v in query.items())
+        ]
+
+        class Cursor:
+            def __init__(self, docs):
+                self.docs = docs
+
+            def sort(self, key, direction):
+                self.docs.sort(key=lambda x: x.get(key), reverse=direction == -1)
+                return self
+
+            async def to_list(self, length=None):
+                if length is None:
+                    return self.docs
+                return self.docs[:length]
+
+        return Cursor(matching)
+
+
+class FakeDB:
+    def __init__(self):
+        self.snapshots = FakeCollection()
+        self.analysis = FakeCollection()
+
+
+def override_db():
+    return FakeDB()
 
 
 @pytest.mark.asyncio
-async def test_snapshot_diff():
-    transport = httpx.ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        await ac.post(
-            "/internal/v1/mirror/snapshot",
-            json={"wallet": "0x1", "score": 50, "flags": ["A"]},
-        )
-        response = await ac.post(
-            "/internal/v1/mirror/snapshot",
-            json={"wallet": "0x1", "score": 60, "flags": ["A", "B"]},
-        )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["delta_score"] == 10
-    assert "B" in data["added_flags"]
+async def test_snapshot_and_compare(monkeypatch):
+    db = FakeDB()
+    monkeypatch.setattr(mirror_engine, "get_db", lambda: db)
+
+    first = {"wallet": "0x1", "flags": ["A"], "score": 10}
+    second = {"wallet": "0x1", "flags": ["A", "B"], "score": 20}
+
+    await mirror_engine.snapshot_event(first)
+    await mirror_engine.snapshot_event(second)
+
+    diff = await mirror_engine.compare_snapshots("0x1")
+    assert diff["score_change"] == 10
+    assert diff["flags_added"] == ["B"]
+    assert diff["flags_removed"] == []
