@@ -1,5 +1,7 @@
 from typing import List
-from app.services import sherlock, kyc, score_engine, mirror_engine
+
+from app.services import kyc, sherlock
+from src.services import score_engine
 from app.utils.db import get_db
 
 
@@ -15,7 +17,19 @@ def aggregate_flags(
 
 
 async def analyze(wallet_address: str) -> dict:
-    """Analyze a wallet and store the result in MongoDB."""
+
+    """Analyze a wallet and store the result in MongoDB.
+
+    Parameters
+    ----------
+    wallet_address:
+        Address of the wallet being analyzed.
+
+    Returns
+    -------
+    dict
+        A dictionary containing score and flag information.
+    """
 
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)
