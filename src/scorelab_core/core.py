@@ -3,11 +3,20 @@
 from app.services import kyc, score_engine, sherlock
 from src.utils.db import get_db
 
+ codex/update-tests-and-fix-imports
+# expose analyze_wallet for testing
+analyze_wallet = sherlock.analyze_wallet
+
+
+def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
+    """Return a unique, sorted list of flags, adding KYC flag when verified."""
+
 analyze_wallet = sherlock.analyze_wallet
 
 
 def aggregate_flags(onchain_flags: list[str], identity: dict) -> list[str]:
     """Return a unique, sorted list of flags, adding a KYC flag when verified."""
+ main
     flags = sorted(set(onchain_flags))
     if identity.get("verified"):
         flags.append("KYC_VERIFIED")

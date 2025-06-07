@@ -6,6 +6,10 @@ from app.services import sentinela, scorelab_service
 from infra import event_bus
 
 router = APIRouter(prefix="/internal/v1/sentinela")
+ codex/update-tests-and-fix-imports
+
+monitor_task: asyncio.Task | None = None
+
 
  codex/remove-unused-imports-and-fix-flake8-issues
 monitor_task: asyncio.Task | None = None
@@ -13,12 +17,16 @@ monitor_task: asyncio.Task | None = None
 # Background task running the event monitor loop.
 _monitor_task: asyncio.Task | None = None
  main
+ main
 
 
 @router.post("/start")
 async def start_monitor() -> dict:
     """Start monitoring wallet activity events."""
+ codex/update-tests-and-fix-imports
+
  codex/remove-unused-imports-and-fix-flake8-issues
+ main
     global monitor_task
     if monitor_task and not monitor_task.done():
 
@@ -47,7 +55,10 @@ async def start_monitor() -> dict:
 @router.post("/stop")
 async def stop_monitor() -> dict:
     """Stop the monitoring task if running."""
+ codex/update-tests-and-fix-imports
+
  codex/remove-unused-imports-and-fix-flake8-issues
+ main
     global monitor_task
     if monitor_task and not monitor_task.done():
         monitor_task.cancel()
@@ -63,12 +74,17 @@ async def stop_monitor() -> dict:
             pass
         _monitor_task = None
     return {"status": "stopped"}
+ codex/update-tests-and-fix-imports
+
+
+
  codex/remove-unused-imports-and-fix-flake8-issues
 
 
 
 
 
+ main
  main
 @router.post("/check")
 def check_event(event: Event) -> dict:
