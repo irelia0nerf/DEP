@@ -37,7 +37,6 @@ async def test_scorelab_analyze(monkeypatch):
     assert data["tier"] == "AAA"
 
 
-
 def test_aggregate_flags_verified():
     from app.services.scorelab_service import aggregate_flags
 
@@ -70,4 +69,3 @@ def test_aggregate_flags_empty_identity():
     result = aggregate_flags(["MIXER_USAGE", "MIXER_USAGE"], {})
 
     assert result == ["MIXER_USAGE"]
-

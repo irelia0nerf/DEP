@@ -5,7 +5,7 @@ import pytest
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
 
-from app.services import mirror_engine
+from app.services import mirror_engine  # noqa: E402
 
 
 class FakeCollection:
