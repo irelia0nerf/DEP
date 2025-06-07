@@ -12,15 +12,19 @@ from app.services import kyc  # noqa: E402
 @pytest.mark.asyncio
 async def test_get_identity_verified_level():
     result = await kyc.get_identity("0x1234")
+    assert result["wallet"] == "0x1234"
     assert result["verified"] is True
     assert 1 <= result["kyc_level"] <= 3
+    assert result["pii"]["email"] == "user1234@example.com"
 
 
 @pytest.mark.asyncio
 async def test_get_identity_unverified_level_zero():
     result = await kyc.get_identity("0x1235")
+    assert result["wallet"] == "0x1235"
     assert result["verified"] is False
     assert result["kyc_level"] == 0
+    assert result["pii"]["email"] == "user1235@example.com"
 
 
 @pytest.mark.asyncio
