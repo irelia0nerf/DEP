@@ -16,6 +16,7 @@ app.include_router(sentinela_router)
 
 @pytest.mark.asyncio
 async def test_monitor_reanalyzes_on_event(monkeypatch):
+    called = {}
     analyzed = []
 
     async def mock_analyze(wallet_address: str):

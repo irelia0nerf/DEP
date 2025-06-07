@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+
 router = APIRouter(prefix="/internal/v1/scorelab_core")
 
 

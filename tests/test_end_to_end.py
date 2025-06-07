@@ -6,6 +6,7 @@ import pytest
 import httpx
 from fastapi import FastAPI
 from httpx import AsyncClient
+import types
 
 from app.routers.scorelab import router as scorelab_router
 from app.routers.mirror_engine import router as mirror_router
@@ -14,6 +15,41 @@ from app.routers.compliance import router as compliance_router
 from app.services import compliance, sigilmesh
 
 app = FastAPI()
+ codex/update-tests-and-fix-imports
+
+app.include_router(scorelab.router)
+
+# Ensure app import path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from main import app  # noqa: E402
+ codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
+from app.routers.scorelab import router as scorelab_router  # noqa: E402
+from app.routers.mirror_engine import router as mirror_router  # noqa: E402
+from app.routers.sigilmesh import router as sigil_router  # noqa: E402
+from app.routers.compliance import router as compliance_router  # noqa: E402
+ 6gjf82-codex/editar-src/utils/db.py-para-get_db
+from app.services.compliance import compliance  # noqa: E402
+from app.services import sigilmesh  # noqa: E402
+
+from app.services import compliance, sigilmesh  # noqa: E402
+
+
+async def mock_get_identity(wallet_address: str):
+    return {
+        "wallet": wallet_address,
+        "verified": True,
+        "kyc_level": 1,
+        "pii": {"email": "test@example.com"},
+    }
+
+
+async def mock_calculate(data):
+    return {"score": 50, "tier": "B"}
+
+dummy_db = {}
+ main
+
+ main
 app.include_router(scorelab_router)
 app.include_router(mirror_router)
 app.include_router(sigil_router)
