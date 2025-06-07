@@ -3,7 +3,7 @@ uvicorn
 motor
 httpx
 pydantic
-flake8
-pytest
+flake8>=7.2.0
+pytest>=8.3.5
 coverage
 cryptography
