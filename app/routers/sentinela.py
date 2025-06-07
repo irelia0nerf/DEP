@@ -7,16 +7,25 @@ from infra import event_bus
 
 router = APIRouter(prefix="/internal/v1/sentinela")
 
+ codex/remove-unused-imports-and-fix-flake8-issues
+monitor_task: asyncio.Task | None = None
+
 # Background task running the event monitor loop.
 _monitor_task: asyncio.Task | None = None
+ main
 
 
 @router.post("/start")
 async def start_monitor() -> dict:
     """Start monitoring wallet activity events."""
+ codex/remove-unused-imports-and-fix-flake8-issues
+    global monitor_task
+    if monitor_task and not monitor_task.done():
+
 
     global _monitor_task
     if _monitor_task and not _monitor_task.done():
+ main
         return {"status": "running"}
 
     async def _run() -> None:
@@ -38,20 +47,30 @@ async def start_monitor() -> dict:
 @router.post("/stop")
 async def stop_monitor() -> dict:
     """Stop the monitoring task if running."""
+ codex/remove-unused-imports-and-fix-flake8-issues
+    global monitor_task
+    if monitor_task and not monitor_task.done():
+        monitor_task.cancel()
+
 
     global _monitor_task
     if _monitor_task:
         _monitor_task.cancel()
+ main
         try:
             await _monitor_task
         except asyncio.CancelledError:
             pass
         _monitor_task = None
     return {"status": "stopped"}
+ codex/remove-unused-imports-and-fix-flake8-issues
 
 
+
+
+
+ main
 @router.post("/check")
 def check_event(event: Event) -> dict:
     """Check whether the given event would trigger a reanalysis."""
-
     return {"trigger": sentinela.is_flag_trigger(event.model_dump())}
