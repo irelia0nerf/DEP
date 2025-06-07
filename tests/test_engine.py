@@ -6,6 +6,7 @@ sys.path.insert(0, ROOT)
 
 from src.services.engine import bayes_px, calculate_score  # noqa: E402
 from src.models import WalletData  # noqa: E402
+import asyncio
 
 
 def test_bayes_px_bounds():
@@ -15,5 +16,5 @@ def test_bayes_px_bounds():
 
 def test_calculate_score():
     data = WalletData(wallet_address="0xabc", tx_volume=1200, age_days=365)
-    result = calculate_score(data)
+    result = asyncio.run(calculate_score(data))
     assert "score" in result and "tier" in result and "probability" in result
