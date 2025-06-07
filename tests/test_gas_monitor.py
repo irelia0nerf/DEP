@@ -1,19 +1,17 @@
-from app.services import gas_monitor
+import os
+import sys
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from app.services import gas_monitor  # noqa: E402
 
 
-def test_detect_gas_patterns_high_avg():
-    flags, avg = gas_monitor.detect_gas_patterns([400000, 450000])
-    assert "HIGH_AVG_GAS" in flags
-    assert avg > 300000
+def test_gas_spike_flag():
+    result = gas_monitor.analyze_gas_usage([10, 20, 100])
+    assert "GAS_SPIKE" in result["flags"]
 
 
-def test_detect_gas_patterns_spike_and_extreme():
-    flags, _ = gas_monitor.detect_gas_patterns([100000, 700000])
-    assert "GAS_SPIKE" in flags
-    assert "EXTREME_GAS_USAGE" in flags
-
-
-def test_detect_gas_patterns_normal_usage():
-    flags, avg = gas_monitor.detect_gas_patterns([21000, 22000, 23000])
-    assert flags == []
-    assert 21000 <= avg <= 23000
+def test_low_gas_flag():
+    result = gas_monitor.analyze_gas_usage([5, 6, 8])
+    assert "LOW_GAS_USAGE" in result["flags"]

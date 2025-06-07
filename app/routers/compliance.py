@@ -1,11 +1,23 @@
+from typing import List
+
 from fastapi import APIRouter
-from app.models.compliance import ComplianceRequest, ComplianceResult
+from pydantic import BaseModel
+
 from app.services import compliance
 
 
-router = APIRouter(prefix="/internal/v1")
+class ComplianceRequest(BaseModel):
+    wallet_address: str
+    verified: bool
+    flags: List[str]
 
 
-@router.post("/compliance/check", response_model=ComplianceResult)
-async def check(request: ComplianceRequest):
-    return await compliance.check_compliance(request.dict())
+router = APIRouter(prefix="/internal/v1/compliance")
+
+
+@router.post("/evaluate")
+def evaluate(req: ComplianceRequest):
+    """Return a compliance evaluation for the wallet."""
+
+    kyc_info = {"verified": req.verified}
+    return compliance.evaluate(req.wallet_address, kyc_info, req.flags)

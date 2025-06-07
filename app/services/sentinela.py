@@ -1,35 +1,19 @@
-"""Sentinela monitoring service."""
+from typing import Any, AsyncGenerator, AsyncIterator, Dict
 
-import asyncio
-from contextlib import suppress
-from typing import Optional
-
-from infra.event_bus import listen_events, publish_event
-from app.services import scorelab_service
+THRESHOLD_GAS = 50000
 
 
-monitor_task: Optional[asyncio.Task] = None
+def is_flag_trigger(event: Dict[str, Any]) -> bool:
+    """Return ``True`` if the event should trigger a reanalysis."""
+
+    return event.get("gas", 0) > THRESHOLD_GAS or event.get("anomaly", False)
 
 
-async def monitor_loop() -> None:
-    """Listen for wallet activity events and trigger reanalysis."""
-    async for event in listen_events("wallet.activity"):
-        wallet = event.get("wallet")
-        if wallet:
-            await scorelab_service.analyze(wallet)
-            await publish_event("score.reanalyzed", {"wallet": wallet})
+async def monitor_loop(
+    events: AsyncIterator[Dict[str, Any]],
+) -> AsyncGenerator[Dict[str, Any], None]:
+    """Yield events that pass the trigger rules."""
 
-
-async def start_monitoring() -> None:
-    global monitor_task
-    if monitor_task is None or monitor_task.done():
-        monitor_task = asyncio.create_task(monitor_loop())
-
-
-async def stop_monitoring() -> None:
-    global monitor_task
-    if monitor_task is not None:
-        monitor_task.cancel()
-        with suppress(asyncio.CancelledError):
-            await monitor_task
-        monitor_task = None
+    async for event in events:
+        if is_flag_trigger(event):
+            yield {"wallet_address": event.get("wallet"), "context": event}

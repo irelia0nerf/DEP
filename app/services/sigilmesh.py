@@ -1,12 +1,16 @@
+from datetime import datetime
+from typing import Any, Dict
 from uuid import uuid4
-from typing import Dict
 
 
-async def mint_snapshot(snapshot: Dict) -> Dict:
-    """Mint a reputation NFT from a snapshot."""
-    nft_id = f"nft-{uuid4().hex[:8]}"
-    return {
-        "nft_id": nft_id,
-        "snapshot_id": snapshot.get("snapshot_id"),
-        "wallet": snapshot.get("wallet"),
+async def mint_reputation_nft(analysis: Dict[str, Any]) -> Dict[str, Any]:
+    """Mint a reputation NFT representing the analysis result."""
+
+    token_id = uuid4().hex
+    nft = {
+        "token_id": token_id,
+        "ipfs_uri": f"ipfs://{token_id}",
+        "issued_at": datetime.utcnow(),
+        "analysis": analysis,
     }
+    return nft

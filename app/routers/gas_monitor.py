@@ -1,11 +1,20 @@
+from typing import List
+
 from fastapi import APIRouter
-from app.models.gas_monitor import GasCheckRequest, GasCheckResult
+from pydantic import BaseModel
+
 from app.services import gas_monitor
 
-router = APIRouter(prefix="/internal/v1")
+
+class GasHistory(BaseModel):
+    gas_prices: List[int]
 
 
-@router.post("/gasmonitor/check", response_model=GasCheckResult)
-async def gas_check(request: GasCheckRequest) -> GasCheckResult:
-    flags = gas_monitor.detect_anomalies(request.gas_used)
-    return GasCheckResult(flags=flags)
+router = APIRouter(prefix="/internal/v1/gasmonitor")
+
+
+@router.post("/analyze")
+def analyze_gas(history: GasHistory):
+    """Return gas usage analysis for the provided history."""
+
+    return gas_monitor.analyze_gas_usage(history.gas_prices)

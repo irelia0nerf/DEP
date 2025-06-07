@@ -1,8 +1,9 @@
+
 from fastapi import APIRouter
+
 
 from app.models.schemas import WalletData
 from app.services import engine
-
 
 router = APIRouter(prefix="/score")
 
@@ -28,5 +29,6 @@ router = APIRouter(prefix="/score")
     },
 )
 def calculate_score(data: WalletData):
-    """Calculate a Bayesian reputation score for a wallet."""
+    """Calculate a score for the wallet using the engine service."""
+
     return engine.calculate_score(data)
