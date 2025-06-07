@@ -6,12 +6,5 @@ pydantic
 cryptography
 flake8>=7.2.0
 pytest>=8.3.5
- codex/update-tests-and-fix-imports
 pytest-asyncio
 coverage
-
-coverage
-pytest-asyncio
-cryptography
-pytest-asyncio
- main
