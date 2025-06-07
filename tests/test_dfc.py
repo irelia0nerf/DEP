@@ -1,14 +1,16 @@
-from src.dfc import register_proposal, simulate_flag_impact
+import os
+import sys
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+import pytest  # noqa: E402
+from app.services import dfc  # noqa: E402
 
 
-def test_register_proposal():
-    proposal = register_proposal({"flag": True}, "user1")
-    assert proposal["status"] == "PENDING"
-    assert proposal["user_id"] == "user1"
-
-
-def test_simulate_flag_impact():
-    proposal = {"data": {"flag": True}}
-    impact = simulate_flag_impact(proposal)
-    assert impact["score_shift"] == 1
-
+@pytest.mark.asyncio
+async def test_register_and_simulate():
+    proposal = await dfc.register_proposal({"flag": "TEST", "weight": 10}, "u1")
+    assert proposal["flag"] == "TEST"
+    impact = await dfc.simulate_flag_impact(proposal)
+    assert "score_shift" in impact

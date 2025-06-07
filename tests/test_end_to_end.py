@@ -1,79 +1,96 @@
 import sys
 from pathlib import Path
-import types
-
 import pytest
 import httpx
 from httpx import AsyncClient
 
-# Ensure app import path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from main import app  # noqa: E402
+from app.routers.scorelab import router as scorelab_router  # noqa: E402
+from app.routers.mirror_engine import router as mirror_router  # noqa: E402
+from app.routers.sigilmesh import router as sigil_router  # noqa: E402
+from app.routers.compliance import router as compliance_router  # noqa: E402
+
+app.include_router(scorelab_router)
+app.include_router(mirror_router)
+app.include_router(sigil_router)
+app.include_router(compliance_router)
 
 
 @pytest.mark.asyncio
-async def test_full_analysis_flow(monkeypatch):
-    """Simulate analysis to NFT minting with patched services."""
+async def test_analysis_to_nft(monkeypatch):
+    async def mock_analyze(wallet_address: str):
+        return {
+            "wallet": wallet_address,
+            "flags": ["MOCK_FLAG"],
+            "score": 90,
+            "tier": "AAA",
+            "confidence": 0.99,
+            "timestamp": "2025-01-01T00:00:00Z",
+        }
 
-    # Step 1: patch ScoreLab dependencies
-    async def mock_analyze_wallet(addr: str):
-        return ["MIXER_USAGE", "HIGH_BALANCE"]
+    async def mock_snapshot_analysis(data):
+        return {**data, "snapshot_id": "snap1"}
 
-    async def mock_get_identity(addr: str):
-        return {"wallet": addr, "verified": True}
+    async def mock_mint_snapshot(snapshot):
+        return {
+            "nft_id": "nft1",
+            "snapshot_id": snapshot["snapshot_id"],
+            "wallet": snapshot["wallet"],
+        }
 
-    def mock_calculate(flags):
-        return 95, "AAA", 0.99
+    async def mock_check_compliance(data):
+        return {"wallet": data["wallet"], "compliant": True}
 
-    class DummyColl:
-        async def insert_one(self, data):
-            self.saved = data
-
-    class DummyDB:
-        def __init__(self):
-            self.analysis = DummyColl()
-
-    dummy_db = DummyDB()
     monkeypatch.setattr(
-        "app.services.sherlock.analyze_wallet",
-        mock_analyze_wallet,
+        "app.services.scorelab_service.analyze",
+        mock_analyze,
     )
-    monkeypatch.setattr("app.services.kyc.get_identity", mock_get_identity)
-    monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
-    monkeypatch.setattr("app.utils.db.get_db", lambda: dummy_db)
-    monkeypatch.setattr("app.services.scorelab_service.get_db", lambda: dummy_db)
+    monkeypatch.setattr(
+        "app.services.mirror_engine.snapshot_analysis",
+        mock_snapshot_analysis,
+    )
+    monkeypatch.setattr(
+        "app.services.sigilmesh.mint_snapshot",
+        mock_mint_snapshot,
+    )
+    monkeypatch.setattr(
+        "app.services.compliance.check_compliance",
+        mock_check_compliance,
+    )
 
     transport = httpx.ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        resp = await ac.post(
+        analysis_resp = await ac.post(
             "/internal/v1/scorelab/analyze",
-            json={"wallet_address": "0xabc"},
+            json={"wallet_address": "0x123"},
         )
-    assert resp.status_code == 200
-    analysis = resp.json()
-    assert analysis["wallet"] == "0xabc"
+        assert analysis_resp.status_code == 200
+        analysis_data = analysis_resp.json()
 
-    # Step 2: Mirror Engine comparison
-    def mock_compare(current):
-        return {"delta": 0, **current}
+        snapshot_resp = await ac.post(
+            "/internal/v1/mirror/snapshot",
+            json=analysis_data,
+        )
+        assert snapshot_resp.status_code == 200
+        snapshot_data = snapshot_resp.json()
+        assert snapshot_data["snapshot_id"] == "snap1"
 
-    mirror_engine = types.SimpleNamespace(compare=mock_compare)
+        nft_resp = await ac.post(
+            "/internal/v1/sigilmesh/mint",
+            json=snapshot_data,
+        )
+        assert nft_resp.status_code == 200
+        nft_data = nft_resp.json()
+        assert nft_data["nft_id"] == "nft1"
 
-    # Step 3: Compliance check
-    def mock_check(result):
-        return result["score"] >= 50
-
-    compliance = types.SimpleNamespace(check=mock_check)
-
-    # Step 4: SigilMesh minting
-    def mock_mint(data):
-        return {"token_id": "1", "wallet": data["wallet"]}
-
-    sigilmesh = types.SimpleNamespace(mint_reputation_nft=mock_mint)
-
-    # Execute mocked pipeline
-    compared = mirror_engine.compare(analysis)
-    assert compared["delta"] == 0
-    assert compliance.check(compared)
-    nft = sigilmesh.mint_reputation_nft(compared)
-    assert nft["wallet"] == "0xabc"
+        compliance_resp = await ac.post(
+            "/internal/v1/compliance/check",
+            json={
+                "wallet": analysis_data["wallet"],
+                "tier": analysis_data["tier"],
+            },
+        )
+        assert compliance_resp.status_code == 200
+        compliance_data = compliance_resp.json()
+        assert compliance_data["compliant"] is True

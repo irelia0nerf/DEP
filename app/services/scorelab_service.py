@@ -1,20 +1,34 @@
-from src.scorelab_core import aggregate_flags, analyze as core_analyze
+from app.utils.db import get_db
+from app.services import sherlock, kyc, score_engine
+from src.scorelab_core import aggregate_flags
 
-__all__ = ["aggregate_flags", "analyze"]
+__all__ = ["aggregate_flags", "analyze", "get_analysis"]
 
 
 async def analyze(wallet_address: str) -> dict:
-    """Proxy to scorelab_core.analyze."""
-    return await core_analyze(wallet_address)
+    """Run a ScoreLab analysis and persist the result."""
+    onchain_flags = await sherlock.analyze_wallet(wallet_address)
+    identity = await kyc.get_identity(wallet_address)
+    flags = aggregate_flags(onchain_flags, identity)
+    score, tier, confidence = score_engine.calculate(flags)
+
+    result = {
+        "wallet": wallet_address,
+        "flags": flags,
+        "score": score,
+        "tier": tier,
+        "confidence": confidence,
+    }
 
     db = get_db()
     await db.analysis.insert_one(result)
+    diff = await mirror_engine.compare_snapshot(wallet_address, result)
+    await mirror_engine.save_snapshot(result)
+    result["snapshot_diff"] = diff
     return result
 
 
 async def get_analysis(wallet_address: str) -> dict | None:
-    """Retrieve the latest analysis for a wallet from MongoDB."""
-
+    """Retrieve the latest analysis for a wallet."""
     db = get_db()
-    doc = await db.analysis.find_one({"wallet": wallet_address}, {"_id": 0})
-    return doc
+    return await db.analysis.find_one({"wallet": wallet_address}, {"_id": 0})
