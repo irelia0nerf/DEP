@@ -1,19 +1,17 @@
-from pydantic import BaseModel
+from datetime import datetime
 from typing import List
 
+from pydantic import BaseModel
 
-class Snapshot(BaseModel):
-    """Snapshot of a wallet reputation state."""
 
+class SnapshotRequest(BaseModel):
     wallet: str
-    score: int
     flags: List[str]
+    score: int
+    tier: str
+    confidence: float
+    timestamp: datetime
 
 
-class SnapshotDiff(BaseModel):
-    """Difference between two snapshots."""
-
-    wallet: str
-    delta_score: int
-    added_flags: List[str]
-    removed_flags: List[str]
+class SnapshotResult(SnapshotRequest):
+    snapshot_id: str
