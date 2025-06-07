@@ -3,7 +3,8 @@
 from datetime import datetime
 from typing import List
 
-from app.services import kyc, score_engine, sherlock
+from app.services import kyc, sherlock
+from src.services import score_engine
 from app.utils.db import get_db
 
 
@@ -32,7 +33,6 @@ async def analyze(wallet_address: str) -> dict:
     dict
         A dictionary containing score and flag information.
     """
-
 
     onchain_flags = await sherlock.analyze_wallet(wallet_address)
     identity = await kyc.get_identity(wallet_address)
