@@ -1,11 +1,4 @@
-import os
-import sys
-
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT)
-
-
-
+from app.services import compliance
 
 class FakeCursor:
     def __init__(self, docs):

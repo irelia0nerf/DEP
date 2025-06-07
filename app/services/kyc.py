@@ -8,6 +8,7 @@ from cryptography.fernet import Fernet
 async def get_identity(
     wallet_address: str, *, fernet: Optional[Fernet] = None
 ) -> Dict[str, Any]:
+ codex/extend-get_identity-to-compute-kyc_level-and-encrypt-email
     """Return simulated KYC information for ``wallet_address``.
 
     Parameters
@@ -31,6 +32,9 @@ async def get_identity(
     ``fernet`` instance is supplied.
     """
 
+=======
+    """Return simulated KYC information for a wallet."""
+ main
     if not wallet_address:
         return {
             "wallet": wallet_address,
@@ -42,7 +46,7 @@ async def get_identity(
     last = wallet_address[-1]
     try:
         val = int(last, 16)
-    except ValueError:  # pragma: no cover - invalid hex should rarely happen
+    except ValueError:  # pragma: no cover
         val = 0
 
     even_digits = set("02468aceACE")

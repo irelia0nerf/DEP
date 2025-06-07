@@ -17,6 +17,7 @@ async def snapshot_event(data: Dict[str, Any]) -> Dict[str, Any]:
         await collection.insert_one(snapshot)
     return snapshot
 
+
 async def compare_snapshots(wallet: str) -> Dict[str, Any]:
     """Return the diff between the last two snapshots for a wallet."""
     db = get_db()
