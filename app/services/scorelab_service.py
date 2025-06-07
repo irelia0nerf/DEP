@@ -1,11 +1,10 @@
-from typing import List
 from app.services import sherlock, kyc, score_engine
 from app.utils.db import get_db
 
 
 def aggregate_flags(
-    onchain_flags: List[str], identity: dict, gas_flags: List[str] | None = None
-) -> List[str]:
+    onchain_flags: list[str], identity: dict, gas_flags: list[str] | None = None
+) -> list[str]:
     """Combine flags from all sources and return them sorted."""
 
     flags = set(onchain_flags)
