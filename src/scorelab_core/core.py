@@ -1,27 +1,26 @@
-from typing import List
+"""Core analysis logic used by ScoreLab services."""
 
 from app.services import kyc, score_engine, sherlock
 from src.utils.db import get_db
 
-# expose analyze_wallet for testing hooks
+ codex/update-tests-and-fix-imports
+# expose analyze_wallet for testing
 analyze_wallet = sherlock.analyze_wallet
 
 
 def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
-    """Return a unique, sorted list of flags, adding a KYC flag when verified."""
-codex/fix-variável-aggregate_flags
-    flags = set(onchain_flags)
+    """Return a unique, sorted list of flags, adding KYC flag when verified."""
 
-    flags = sorted(set(onchain_flags))
+analyze_wallet = sherlock.analyze_wallet
+
+
+def aggregate_flags(onchain_flags: list[str], identity: dict) -> list[str]:
+    """Return a unique, sorted list of flags, adding a KYC flag when verified."""
  main
+    flags = sorted(set(onchain_flags))
     if identity.get("verified"):
- codex/preencher-src/utils/db.py-com-lógica-de-app/utils/db.py
         flags.append("KYC_VERIFIED")
     return flags
-
-        flags.add("KYC_VERIFIED")
-    return sorted(flags)
- main
 
 
 async def analyze(wallet_address: str) -> dict:
