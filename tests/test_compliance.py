@@ -6,6 +6,7 @@ sys.path.insert(0, ROOT)
 
 
 
+
 class FakeCursor:
     def __init__(self, docs):
         self.docs = docs

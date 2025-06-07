@@ -1,11 +1,5 @@
 from typing import List
-from app.services import (
-    sherlock,
-    kyc,
-    score_engine,
-    mirror_engine,
-    gas_monitor,
-)
+from app.services import sherlock, kyc, score_engine, mirror_engine, gas_monitor
 from app.utils.db import get_db
 
 

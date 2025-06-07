@@ -46,10 +46,9 @@ async def compare_snapshots(wallet: str) -> Dict[str, Any]:
     added_flags = [f for f in data["flags"] if f not in previous["flags"]]
     removed_flags = [f for f in previous["flags"] if f not in data["flags"]]
     return {
-        "wallet": wallet,
-        "delta_score": delta_score,
-        "added_flags": added_flags,
-        "removed_flags": removed_flags,
+        "latest": latest,
+        "previous": previous,
+        "score_change": latest.get("score", 0) - previous.get("score", 0),
+        "flags_added": list(flags_latest - flags_previous),
+        "flags_removed": list(flags_previous - flags_latest),
     }
-
-    return list(_SNAPSHOTS)
