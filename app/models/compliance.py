@@ -1,16 +1,14 @@
-from pydantic import BaseModel
 from typing import List
+from pydantic import BaseModel
 
 
 class ComplianceRequest(BaseModel):
-    """Input for compliance checks."""
-
     wallet_address: str
 
 
 class ComplianceResult(BaseModel):
-    """Output of compliance verification."""
-
     wallet: str
-    passes: bool
-    issues: List[str]
+    kyc_verified: bool
+    kyt_flags: List[str]
+    status: str
+    ts: str

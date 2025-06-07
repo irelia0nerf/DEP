@@ -1,15 +1,17 @@
-"""Endpoints for Compliance Orchestrator."""
-
+from typing import List
 from fastapi import APIRouter
+
 from app.models.compliance import ComplianceRequest, ComplianceResult
 from app.services import compliance
 
-router = APIRouter(prefix="/internal/v1")
+router = APIRouter(prefix="/internal/v1/compliance")
 
 
-@router.post("/compliance/check", response_model=ComplianceResult)
-async def check(req: ComplianceRequest) -> ComplianceResult:
-    """Run compliance verification for a wallet."""
+@router.post("/evaluate", response_model=ComplianceResult)
+async def evaluate(req: ComplianceRequest):
+    return await compliance.evaluate(req.wallet_address)
 
-    result = await compliance.check_compliance(req.wallet_address)
-    return ComplianceResult(**result)
+
+@router.get("/logs", response_model=List[ComplianceResult])
+async def logs(limit: int = 10):
+    return await compliance.get_logs(limit)

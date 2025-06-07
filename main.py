@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.routers import score, scorelab, sigilmesh
+from app.routers import score, scorelab, compliance
+
 
 
 app = FastAPI()
@@ -10,6 +11,8 @@ app.include_router(score.router)
 
 app.include_router(scorelab.router)
 app.include_router(sigilmesh.router)
+
+app.include_router(compliance.router)
 
 
 @app.get("/")
