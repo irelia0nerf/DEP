@@ -1,6 +1,5 @@
 
-import os
-from functools import lru_cache
+"""Wrapper around ``src.utils`` database helpers."""
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 

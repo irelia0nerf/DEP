@@ -1,15 +1,18 @@
-"""Endpoints for Mirror Engine."""
-
 from fastapi import APIRouter
-from app.models.mirror import Snapshot, SnapshotDiff
+from pydantic import BaseModel
+
 from app.services import mirror_engine
 
-router = APIRouter(prefix="/internal/v1")
+
+class SnapshotRequest(BaseModel):
+    event: dict
 
 
-@router.post("/mirror/snapshot", response_model=SnapshotDiff)
-async def snapshot(data: Snapshot) -> SnapshotDiff:
-    """Store a snapshot and get difference from previous one."""
+router = APIRouter(prefix="/internal/v1/mirror")
 
-    diff = mirror_engine.snapshot_event(data.dict())
-    return SnapshotDiff(**diff)
+
+@router.post("/snapshot")
+async def snapshot(req: SnapshotRequest):
+    """Store a mirror snapshot of the provided event."""
+
+    return await mirror_engine.snapshot_event(req.event)

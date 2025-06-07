@@ -24,5 +24,5 @@ app.include_router(sigilmesh.router)
 
 
 @app.get("/")
-def root():
+async def root():
     return {"status": "FoundLab DEP API online"}
