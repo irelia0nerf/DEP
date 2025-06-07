@@ -50,9 +50,15 @@ async def test_full_analysis_flow(monkeypatch):
             "/internal/v1/scorelab/analyze",
             json={"wallet_address": "0xabc"},
         )
+ codex/implement-kyc-logic-and-adjust-tests
     assert resp.status_code == 200
     analysis = resp.json()
     assert analysis["wallet"] == "0xabc"
+
+    assert analysis_resp.status_code == 200
+    analysis = analysis_resp.json()
+    assert analysis["wallet"] == "0x" + "a" * 40
+ main
 
     # Step 2: Mirror Engine comparison
     def mock_compare(current):

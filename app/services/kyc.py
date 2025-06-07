@@ -53,11 +53,21 @@ async def get_identity(
 
     even_digits = set("02468aceACE")
     is_verified = last in even_digits
+ codex/implement-kyc-logic-and-adjust-tests
     kyc_level = val % 3 + 1 if is_verified else 0
     local_part = (
         wallet_address[2:] if wallet_address.startswith("0x") else wallet_address
     )
     email = f"user{local_part}@example.com"
+=======
+
+    if is_verified:
+        kyc_level = val % 3 + 1
+    else:
+        kyc_level = 0
+
+    email = f"user{wallet_address[2:]}@example.com"
+ main
     if fernet:
         email = fernet.encrypt(email.encode()).decode()
 
