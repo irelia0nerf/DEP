@@ -11,8 +11,8 @@ def aggregate_flags(onchain_flags: List[str], identity: dict) -> List[str]:
     """Combine on-chain flags with identity information."""
     flags = sorted(set(onchain_flags))
     if identity.get("verified"):
-        unique.append("KYC_VERIFIED")
-    return unique
+        flags.append("KYC_VERIFIED")
+    return flags
 
 
 async def analyze(wallet_address: str) -> dict:
