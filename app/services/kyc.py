@@ -51,7 +51,6 @@ async def get_identity(
     except ValueError:  # pragma: no cover - invalid hex should rarely happen
         val = 0
 
-        
     even_digits = set("02468aceACE")
     is_verified = wallet_address[-1] in even_digits
 

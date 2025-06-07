@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import types
 import pytest
 import httpx
 from httpx import AsyncClient
@@ -10,6 +11,22 @@ from app.routers.scorelab import router as scorelab_router  # noqa: E402
 from app.routers.mirror_engine import router as mirror_router  # noqa: E402
 from app.routers.sigilmesh import router as sigil_router  # noqa: E402
 from app.routers.compliance import router as compliance_router  # noqa: E402
+from app.services import compliance, sigilmesh  # noqa: E402
+
+
+async def mock_get_identity(wallet_address: str):
+    return {
+        "wallet": wallet_address,
+        "verified": True,
+        "kyc_level": 1,
+        "pii": {"email": "test@example.com"},
+    }
+
+
+async def mock_calculate(data):
+    return {"score": 50, "tier": "B"}
+
+dummy_db = {}
 
 app.include_router(scorelab_router)
 app.include_router(mirror_router)
@@ -44,11 +61,11 @@ async def test_analysis_to_nft(monkeypatch):
 
     monkeypatch.setattr(
         "src.sherlock.analyzer.analyze_wallet",
-        mock_analyze_wallet,
+        mock_analyze,
     )
     monkeypatch.setattr(
         "src.scorelab_core.core.analyze_wallet",
-        mock_analyze_wallet,
+        mock_analyze,
     )
     monkeypatch.setattr("app.services.kyc.get_identity", mock_get_identity)
     monkeypatch.setattr("app.services.score_engine.calculate", mock_calculate)
@@ -79,7 +96,7 @@ async def test_analysis_to_nft(monkeypatch):
 
         snapshot_resp = await ac.post(
             "/internal/v1/mirror/snapshot",
-            json=analysis_data,
+            json=analysis,
         )
         assert snapshot_resp.status_code == 200
         snapshot_data = snapshot_resp.json()
