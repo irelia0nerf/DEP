@@ -1,32 +1,12 @@
-"""SigilMesh NFT minting simulation service."""
-
-from datetime import datetime
-from typing import Any, Dict, Optional
-
-from app.utils.db import get_db
+from uuid import uuid4
+from typing import Dict
 
 
-async def get_latest_analysis(wallet_address: str) -> Optional[Dict[str, Any]]:
-    """Return the most recent analysis for a wallet from MongoDB."""
-    db = get_db()
-    doc = await db.analysis.find_one(
-        {"wallet": wallet_address}, sort=[("timestamp", -1)]
-    )
-    return doc
-
-
-async def mint_reputation_nft(analysis: Dict[str, Any]) -> Dict[str, Any]:
-    """Simulate minting a reputation NFT from an analysis result."""
-    metadata = {
-        "wallet": analysis["wallet"],
-        "score": analysis["score"],
-        "tier": analysis["tier"],
-        "flags": analysis["flags"],
-        "timestamp": (
-            analysis["timestamp"].isoformat()
-            if hasattr(analysis["timestamp"], "isoformat")
-            else analysis["timestamp"]
-        ),
+async def mint_snapshot(snapshot: Dict) -> Dict:
+    """Mint a reputation NFT from a snapshot."""
+    nft_id = f"nft-{uuid4().hex[:8]}"
+    return {
+        "nft_id": nft_id,
+        "snapshot_id": snapshot.get("snapshot_id"),
+        "wallet": snapshot.get("wallet"),
     }
-    token_id = int(datetime.utcnow().timestamp())
-    return {"token_id": token_id, "metadata": metadata}

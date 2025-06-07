@@ -7,8 +7,11 @@ router = APIRouter(prefix="/score")
 
 
 @router.post("/")
-async def calculate_score_endpoint(data: WalletData):
-    """Return a probability-based score for the wallet."""
-    return engine.calculate_score(data)
-
-
+def calculate_score(data: WalletData):
+    # mock score
+    return {
+        "score": 752,
+        "tier": "B",
+        "probability": 0.75,
+        "flags": ["mixer_usage", "low_activity"],
+    }
