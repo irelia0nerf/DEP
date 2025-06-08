@@ -1,211 +1,48 @@
-# FoundLab – Visão Institucional, Técnica & Lógica Modular
+# FoundLab Core – Reputação Modular para Finanças Digitais
 
-## ⚙️ Arquitetura Modular de Reputação & Risco
-
-A FoundLab oferece infraestrutura de reputação programável para o setor financeiro digital, integrando dados on/off-chain, IA, compliance, score de risco, identidade verificável e governança dinâmica.
-
----
-
-## 🧠 Visão Geral
-
-- **Ciclos de análise de risco via ScoreLab**
-- **Orquestração e governança de flags (DFC)**
-- **Monitoramento automatizado (Sentinela)**
-- **Score proprietário (P(x)/smil)**
-- **NFTs reputacionais (SigilMesh)**
-- **Módulos auxiliares e conectores**
+A FoundLab é uma infraestrutura de reputação digital que conecta finanças tradicionais (TradFi) com o universo Web3.  
+Este repositório representa o backend institucional do projeto, com arquitetura modular baseada em FastAPI, MongoDB e lógica proprietária de score P(x).
 
 ---
 
-## 📦 Módulos Core & Estratégicos
+## 🧠 Visão Institucional
 
-### 1. ScoreLab Core
-- Orquestra ingestão, flags e score.
-- Aciona Sherlock, KYC, Provenance, DFC, Score Engine.
-- Output: score, tier, flags e metadata via API.
+A reputação é o novo colateral.  
+A FoundLab permite que instituições analisem, monitorem e mintem confiança com base em comportamento digital, on-chain e off-chain.  
+
+Módulos como ScoreLab, DFC, Sherlock e SigilMesh compõem uma pipeline auditável de risco, reputação e decisão automatizada.
+
+---
+
+## ⚙️ Modularização Real da FoundLab
+
+### 1. ScoreLab Core (`/scorelab_core`)
+- Ingestão de dados e metadados
+- Flags aplicadas via DFC e Sherlock
+- Cálculo do Score `P(x)` com output: tier, score, flags, confiança
 
 ### 2. Dynamic Flag Council (DFC)
-- Governança de lógica de risco.
-- Aprovação/staging de flags sem deploy.
-- Auditável via changelog.
+- Engine de governança e staging de flags
+- Suporta proposta, simulação de impacto e aprovação de novas lógicas de risco
 
-### 3. Sherlock (On-Chain Analyzer)
-- Detecta mixers, wash trades, entidades sancionadas.
-- Flags on-chain para ScoreLab.
+### 3. Sherlock
+- Flags reputacionais baseadas em análise on-chain
+- Integração com Bitquery, Chainalysis e detectores de mixers
 
-### 4. Sentinela (Monitoramento)
-- Escuta eventos e aciona reanálises reputacionais.
+### 4. Sentinela
+- Sistema de triggers reativos com base em eventos de wallet
 
-### 5. Score Engine (P(x)/smil)
-- Algoritmo proprietário de score.
-- IA e lógica matemática sobre flags.
+### 5. Score Engine
+- Cálculo proprietário `P(x)` com base em pesos dinâmicos de flags
+- Retorna score, tier (AAA, BB, RISK) e confiança (0–1)
 
-### 6. Mirror Engine
-- Compara snapshots de risco e evolução reputacional.
-
-### 7. GasMonitor
-- Flags para padrões anômalos de gas.
-
-### 8. SigilMesh (NFT Engine)
-- Score + flags viram NFTs reputacionais (IPFS/DIDs).
-
-### 9. Modular KYC/AI
-- KYC multi-nível com IA, vault PII criptografado.
-
-### 10. Compliance Orchestrator
-- Motor de regras KYC/KYT/Sanções, logs e auditoria.
+### 6. SigilMesh
+- Converte score e flags em NFTs reputacionais (ERC-721/1155)
+- Usa IPFS e DIDs para identidade verificável
 
 ---
 
-## 🔗 APIs e Integrações
-
-- `POST /internal/v1/{módulo}/analyze`
-- `GET /internal/v1/{módulo}/wallet/{address}`
-- Event Bus para eventos críticos
-- Adaptadores: Alchemy, Bitquery, Chainalysis
-
----
-
-## 🔒 Segurança & Compliance
-
-- Vault para PII com criptografia CMEK
-- Auditoria completa (Logs/Audit Trail)
-- LGPD, GDPR, PLD/AML, CFT, Open Finance
-
----
-
-## 🧪 KPIs Críticos
-
-| Métrica                        | Módulo         | Relevância                    |
-|-------------------------------|---------------|-------------------------------|
-| Latência P99 da análise        | ScoreLab      | SLA para fintechs             |
-| Acurácia do score              | Score Engine  | Confiança e explicabilidade   |
-| Flags acionadas por análise    | DFC/Sherlock  | Qualidade de risco            |
-| Uptime dos módulos             | Todos         | Confiabilidade                |
-| Custo de mintagem de NFTs      | SigilMesh     | Viabilidade on-chain          |
-
----
-
-## 🚧 Roadmap (excertos)
-
-- ScoreLab Lite (microtransações)
-- DFC Self-Healing (flags autoajustáveis)
-- TrustFlywheel (impacto reputacional ao longo do tempo)
-- Compliance Score (aderência regulatória)
-
----
-
-## 📎 Requisitos Técnicos
-
-- Backend: Python, Go, Node.js
-- Infra: Docker, MongoDB, EventBus (Kafka/RabbitMQ)
-- Frontend: React + Tailwind
-- On-chain: Ethers.js, IPFS, ERC-721/1155
-
----
-
-## 📁 Organização do Repositório
-
-```bash
-├── /docs
-│   └── DOC_MEGA_SECRETO.md
-├── /src
-│   ├── scorelab_core/
-│   ├── dfc/
-│   ├── sherlock/
-│   ├── sentinela/
-│   ├── sigilmesh/
-│   └── ...
-├── /configs
-│   ├── flag_changelog.json
-│   └── score_config.json
-├── README.md
-```
-
----
-
-## 🧬 Lógica Modular – Exemplos Python (FastAPI)
-
-### ScoreLab Core – Orquestração
-
-```python
-from fastapi import APIRouter
-from models import AnalysisRequest, AnalysisResult
-from services import sherlock, kyc, score_engine, mirror, storage
-
-router = APIRouter()
-
-@router.post("/internal/v1/scorelab/analyze", response_model=AnalysisResult)
-async def analyze_wallet(request: AnalysisRequest):
-    data_sources = {
-        "onchain": await sherlock.analyze_wallet(request.wallet_address),
-        "kyc": await kyc.get_identity(request.wallet_address)
-    }
-    flags = aggregate_flags(data_sources)
-    score, tier, confidence = score_engine.calculate(flags)
-    result = {
-        "wallet": request.wallet_address,
-        "flags": flags,
-        "score": score,
-        "tier": tier,
-        "confidence": confidence
-    }
-    await storage.save_analysis(result)
-    await mirror.snapshot_event(result)
-    return result
-```
-
----
-
-### Dynamic Flag Council (DFC)
-
-```python
-@router.post("/v1/dfc/proposals")
-async def propose_flag_change(flag_data: dict, user_id: str):
-    proposal = await dfc.register_proposal(flag_data, user_id)
-    impact = await dfc.simulate_flag_impact(proposal)
-    if impact["score_shift"] > 5:
-        proposal["status"] = "APPROVED_FOR_STAGING"
-    return proposal
-```
-
----
-
-### Sherlock – Análise On-Chain
-
-```python
-import httpx
-
-async def analyze_wallet(wallet_address: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post("https://api.bitquery.io", json={
-            "query": build_graph_query(wallet_address)
-        }, headers={"X-API-KEY": "YOUR_API_KEY"})
-    data = response.json()
-    flags = detect_patterns(data)
-    return flags
-```
-
----
-
-### Sentinela – Monitoramento
-
-```python
-import asyncio
-from infra.event_bus import listen_events, publish_event
-
-async def monitor_loop():
-    async for event in listen_events("wallet.activity"):
-        if is_flag_trigger(event):
-            await publish_event("score.reanalyze", {
-                "wallet_address": event["wallet"],
-                "context": event["context"]
-            })
-```
-
----
-
-### Score Engine – Algoritmo P(x)/smil
+## 📦 Códigos Funcionais – Exemplo `P(x)` (score_engine)
 
 ```python
 def calculate(flags: list) -> tuple:
@@ -217,47 +54,31 @@ def calculate(flags: list) -> tuple:
         tier = "BB"
     else:
         tier = "RISK"
-    confidence = 0.95  # Simulação estática
+    confidence = 0.95  # Valor simulado
     return score, tier, confidence
 ```
 
 ---
 
-### Integração Simples entre Módulos
+## 📎 API Pública Simulada
 
-```python
-def end_to_end(wallet, context):
-    analysis = analyze_wallet(wallet, context)
-    sigil = mint_reputation_nft(analysis)
-    return sigil
-```
+- `POST /internal/v1/scorelab/analyze`
+- `POST /v1/dfc/proposals`
+- `POST /sherlock/validate`
+- `POST /sigilmesh/metadata`
 
 ---
 
-### Conexão MongoDB (Storage)
+## 🚀 Stack Técnica
 
-```python
-from motor.motor_asyncio import AsyncIOMotorClient
-
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.foundlab
-
-async def save_analysis(result):
-    await db.analysis.insert_one(result)
-```
+- FastAPI + MongoDB (Motor)
+- Docker + Docker Compose
+- GitHub Actions + Ruff + Pytest
+- Modular, escalável, auditável
 
 ---
 
-## 👤 Autoridade Técnica
+## 🔐 Institucional
 
-**Alex Bolson**  
-Founder e Arquiteto-Chefe  
-> Autor dos algoritmos `P(x)/smil` e `Sherlock`. Criador da FoundLab.
-
----
-
-## 🧬 Licença e Uso
-
-Uso restrito. Projeto confidencial, parte da infraestrutura crítica da FoundLab. Disponível apenas sob NDA.
-
----
+> Este projeto faz parte da infraestrutura crítica da FoundLab.  
+> Uso sob NDA. Score `P(x)` é algoritmo proprietário com base em flags e IA.
